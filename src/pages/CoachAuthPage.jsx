@@ -35,52 +35,55 @@ export default function CoachAuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full space-y-6">
-        <h2 className="text-xl font-bold text-center">
+    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
+        <h1 className="text-center text-2xl font-semibold text-gray-800 mb-4">
           {isSignup ? "Coach Sign Up" : "Coach Log In"}
-        </h2>
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-2 border rounded-lg"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <div>
+            <label className="text-sm text-gray-600">Email</label>
+            <input
+              type="email"
+              className="mt-1 w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-2 border rounded-lg"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div>
+            <label className="text-sm text-gray-600">Password</label>
+            <input
+              type="password"
+              className="mt-1 w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-xl hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white p-2 rounded-xl font-medium hover:bg-blue-700 transition"
           >
             {isSignup ? "Create Coach Account" : "Log In"}
           </button>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         </form>
 
-        <p className="text-center text-sm">
+        <div className="mt-4 text-center text-sm text-gray-500">
           {isSignup ? "Already have an account?" : "Need to sign up?"}{" "}
           <button
-            className="text-blue-600 hover:underline"
+            className="text-blue-600 hover:underline font-medium"
             onClick={() => setIsSignup(!isSignup)}
           >
             {isSignup ? "Log in" : "Sign up"}
           </button>
-        </p>
+        </div>
       </div>
     </div>
   );
 }
-
