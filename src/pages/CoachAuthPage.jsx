@@ -4,10 +4,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function CoachAuthPage() {
   const [isSignup, setIsSignup] = useState(true);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,18 +16,28 @@ export default function CoachAuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       if (isSignup) {
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "users", userCred.user.uid), {
+        const uid = userCred.user.uid;
+
+        await setDoc(doc(db, "users", uid), {
+          name,
           email,
           role: "coach",
           createdAt: new Date().toISOString(),
         });
+
         alert("Coach account created!");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        alert("Coach logged in!");
+
+        const uid = auth.currentUser.uid;
+        const docSnap = await getDoc(doc(db, "users", uid));
+        const user = docSnap.data();
+
+        alert(`Welcome back, Coach ${user?.name || ""}`);
       }
     } catch (err) {
       console.error(err);
@@ -42,6 +53,19 @@ export default function CoachAuthPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignup && (
+            <div>
+              <label className="text-sm text-gray-600">Full Name</label>
+              <input
+                type="text"
+                className="mt-1 w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
           <div>
             <label className="text-sm text-gray-600">Email</label>
             <input
