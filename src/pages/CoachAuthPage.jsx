@@ -8,7 +8,8 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function CoachAuthPage() {
   const [isSignup, setIsSignup] = useState(true);
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,7 +24,8 @@ export default function CoachAuthPage() {
         const uid = userCred.user.uid;
 
         await setDoc(doc(db, "users", uid), {
-          name,
+          firstName,
+          lastName,
           email,
           role: "coach",
           createdAt: new Date().toISOString(),
@@ -37,7 +39,7 @@ export default function CoachAuthPage() {
         const docSnap = await getDoc(doc(db, "users", uid));
         const user = docSnap.data();
 
-        alert(`Welcome back, Coach ${user?.name || ""}`);
+        alert(`Welcome back, Coach ${user?.firstName || ""}`);
       }
     } catch (err) {
       console.error(err);
@@ -54,16 +56,28 @@ export default function CoachAuthPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignup && (
-            <div>
-              <label className="text-sm text-gray-600">Full Name</label>
-              <input
-                type="text"
-                className="mt-1 w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              <div>
+                <label className="text-sm text-gray-600">First Name</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">Last Name</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+            </>
           )}
 
           <div>
