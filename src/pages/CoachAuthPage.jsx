@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import {
   createUserWithEmailAndPassword,
@@ -7,6 +8,7 @@ import {
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function CoachAuthPage() {
+  const navigate = useNavigate();
   const [isSignup, setIsSignup] = useState(true);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -31,7 +33,7 @@ export default function CoachAuthPage() {
           createdAt: new Date().toISOString(),
         });
 
-        alert("Coach account created!");
+        navigate("/create-team"); // redirect after signup
       } else {
         await signInWithEmailAndPassword(auth, email, password);
 
@@ -40,6 +42,7 @@ export default function CoachAuthPage() {
         const user = docSnap.data();
 
         alert(`Welcome back, Coach ${user?.firstName || ""}`);
+        navigate("/dashboard");
       }
     } catch (err) {
       console.error(err);
