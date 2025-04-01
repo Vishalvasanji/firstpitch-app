@@ -35,7 +35,7 @@ export default function CoachAuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50 flex items-center justify-center px-4">
+    <div className="min-h-screen overflow-hidden bg-gradient-to-b from-white to-blue-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
         <h1 className="text-center text-2xl font-semibold text-gray-800 mb-4">
           {isSignup ? "Coach Sign Up" : "Coach Log In"}
