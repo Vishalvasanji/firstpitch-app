@@ -33,35 +33,35 @@ export default function CoachDashboard() {
   }, []);
 
   const ProgressCard = ({ title, completed, total }) => (
-    <div className="bg-white shadow rounded-xl p-4 space-y-2 w-full">
-      <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+    <div className="bg-white shadow rounded-2xl p-5 space-y-3 w-full min-h-[100px]">
+      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+      <div className="w-full bg-gray-200 rounded-full h-3">
         <div
-          className="bg-blue-500 h-2 rounded-full"
+          className="bg-blue-500 h-3 rounded-full"
           style={{ width: `${(completed / total) * 100}%` }}
         ></div>
       </div>
-      <p className="text-xs text-gray-600">{completed} of {total} completed</p>
+      <p className="text-sm text-gray-600">{completed} of {total} completed</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen overflow-hidden bg-gradient-to-b from-white to-blue-50 flex flex-col justify-between pb-20">
+    <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 pb-24">
       {/* Header */}
-      <div className="px-4 pt-6 space-y-1">
-        <p className="text-xl font-semibold text-gray-800 text-left">Coach {coachName}</p>
-        <h1 className="text-center text-2xl font-bold text-blue-800">{teamName}</h1>
+      <div className="px-4 pt-6 space-y-1 text-center">
+        <h1 className="text-md text-gray-800 font-medium">{teamName}</h1>
+        <p className="text-3xl font-bold text-blue-800">Coach {coachName}</p>
       </div>
 
       {/* Progress Section */}
-      <div className="px-4 py-4 space-y-4">
+      <div className="px-4 pt-6 space-y-4">
         <ProgressCard title="Drills Progress" completed={drillProgress.completed} total={drillProgress.total} />
         <ProgressCard title="Quizzes Progress" completed={quizProgress.completed} total={quizProgress.total} />
       </div>
 
       {/* Recent Activity */}
-      <div className="px-4">
-        <h2 className="text-md font-semibold text-gray-700 mb-2">Recent Activity</h2>
+      <div className="px-4 pt-6 pb-8">
+        <h2 className="text-md font-semibold text-gray-700 mb-3">Recent Activity</h2>
         <div className="space-y-2">
           {activity.map((item) => (
             <div key={item.id} className="flex items-start space-x-3 bg-white p-3 rounded-xl shadow">
@@ -76,9 +76,7 @@ export default function CoachDashboard() {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav />
     </div>
   );
 }
-
