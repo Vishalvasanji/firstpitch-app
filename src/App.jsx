@@ -3,12 +3,14 @@ import CoachAuthPage from "./pages/CoachAuthPage";
 import CreateTeam from "./pages/CreateTeam";
 import CoachDashboard from "./pages/CoachDashboard";
 import PrivateRoute from "./components/PrivateRoute";
+import JoinTeam from "./pages/JoinTeam";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<CoachAuthPage />} />
+        <Route path="/join" element={<JoinTeam />} />
         <Route
           path="/create-team"
           element={
