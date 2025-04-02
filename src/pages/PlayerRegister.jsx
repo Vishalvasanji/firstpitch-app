@@ -21,7 +21,7 @@ export default function PlayerRegister() {
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
-          Authorization: "Bearer YOUR_RESEND_API_KEY", // 🔐 Replace with your real key
+          Authorization: "re_71QHCq8M_F6UEJGYTSBLpFPgEXLxY1yhj", // 🔐 Replace with your real key
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
