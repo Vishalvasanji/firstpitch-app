@@ -42,14 +42,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/create-drill"
-          element={
-           <PrivateRoute>
-             <CreateDrill />
-           </PrivateRoute>
-          }
-        />
       </Routes>
     </Router>
   );
