@@ -39,7 +39,7 @@ export default function PlayerRegister() {
     try {
       setLoading(true);
       const cred = await createUserWithEmailAndPassword(auth, parentEmail, autoPassword);
-
+      window.localStorage.setItem("pendingParentEmail", parentEmail);
       await sendEmailVerification(cred.user, {
         url: "https://firstpitch-app.vercel.app/verify-check",
         handleCodeInApp: true,
