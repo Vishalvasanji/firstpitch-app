@@ -13,7 +13,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-sm flex justify-around py-2 text-xs text-gray-600 z-50">
+    <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-sm flex justify-around py-2.5 text-xs text-gray-600 z-50">
       {navItems.map((item) => {
         const isActive = location.pathname === item.path;
         return (
