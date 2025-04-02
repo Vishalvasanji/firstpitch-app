@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  signOut,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function PlayerRegister() {
   const [firstName, setFirstName] = useState("");
@@ -14,56 +9,53 @@ export default function PlayerRegister() {
   const [pin, setPin] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const generateVerificationCode = () =>
+    Math.floor(100000 + Math.random() * 900000).toString();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setMessage("");
+    setLoading(true);
 
     const teamId = sessionStorage.getItem("pendingTeamId");
     if (!teamId) {
-      setError("Missing join code. Please try again.");
+      setError("Missing join code. Please re-enter.");
+      setLoading(false);
       return;
     }
 
     if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
       setError("PIN must be a 4-digit number.");
+      setLoading(false);
       return;
     }
 
-    const autoPassword = `firstpitch${Math.floor(Math.random() * 100000)}`;
+    const verificationCode = generateVerificationCode();
 
     try {
-      setLoading(true);
-      const cred = await createUserWithEmailAndPassword(auth, parentEmail, autoPassword);
-      window.localStorage.setItem("pendingParentEmail", parentEmail);
-      await sendEmailVerification(cred.user, {
-        url: "https://firstpitch-app.vercel.app/verify-check",
-        handleCodeInApp: true,
-      });
-
-      await setDoc(doc(db, "players", cred.user.uid), {
+      // Save player with verificationCode
+      const docRef = await addDoc(collection(db, "players"), {
         displayName: `${firstName} ${lastInitial.toUpperCase()}`,
         pin,
-        teamId,
         parentEmail,
-        role: "player",
+        teamId,
         verified: false,
-        createdAt: new Date().toISOString(),
+        verificationCode,
+        createdAt: serverTimestamp(),
       });
 
-      setMessage(
-        "We sent a verification email to the parent. Please check the inbox to approve this player account."
-      );
+      // ✅ Store player ID for next screen
+      sessionStorage.setItem("pendingPlayerId", docRef.id);
 
-      // Log out so the parent doesn't stay signed in
-      await signOut(auth);
+      // TODO: Send email with verificationCode to parentEmail (via EmailJS or similar)
+
+      navigate("/verify-code");
     } catch (err) {
       console.error(err);
-      setError(err.message);
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -120,10 +112,9 @@ export default function PlayerRegister() {
           className="w-full bg-blue-600 text-white p-2 rounded-xl font-medium hover:bg-blue-700 transition"
           disabled={loading}
         >
-          {loading ? "Submitting..." : "Register Player"}
+          {loading ? "Registering..." : "Register Player"}
         </button>
 
-        {message && <p className="text-green-600 text-sm mt-2">{message}</p>}
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </form>
     </div>
