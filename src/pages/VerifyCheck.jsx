@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { updateDoc, doc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function VerifyCheck() {
-  const [status, setStatus] = useState("Checking...");
+  const [status, setStatus] = useState("Checking verification...");
 
   useEffect(() => {
     const checkVerification = async () => {
@@ -14,14 +14,19 @@ export default function VerifyCheck() {
           return;
         }
 
-        await user.reload(); // refresh emailVerified status
+        await user.reload();
 
         if (user.emailVerified) {
-          const ref = doc(db, "players", user.uid);
-          await updateDoc(ref, { verified: true });
-          setStatus("✅ Player registration approved! You may now close this tab.");
+          try {
+            const playerRef = doc(db, "players", user.uid);
+            await updateDoc(playerRef, { verified: true });
+            setStatus("✅ Email verified! This player account is now active.");
+          } catch (err) {
+            console.error(err);
+            setStatus("Error updating player verification. Please try again.");
+          }
         } else {
-          setStatus("Email not verified yet. Please click the link in your inbox.");
+          setStatus("Email is not verified yet. Try clicking the link in your inbox again.");
         }
       });
     };
