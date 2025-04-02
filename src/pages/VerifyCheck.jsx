@@ -14,20 +14,23 @@ export default function VerifyCheck() {
           return;
         }
 
-        await user.reload();
+        // Add 2-second delay to allow email verification to sync
+        setTimeout(async () => {
+          await user.reload();
 
-        if (user.emailVerified) {
-          try {
-            const playerRef = doc(db, "players", user.uid);
-            await updateDoc(playerRef, { verified: true });
-            setStatus("✅ Email verified! This player account is now active.");
-          } catch (err) {
-            console.error(err);
-            setStatus("Error updating player verification. Please try again.");
+          if (user.emailVerified) {
+            try {
+              const playerRef = doc(db, "players", user.uid);
+              await updateDoc(playerRef, { verified: true });
+              setStatus("✅ Email verified! This player account is now active.");
+            } catch (err) {
+              console.error(err);
+              setStatus("Error updating player verification. Please try again.");
+            }
+          } else {
+            setStatus("Still waiting for email verification. Try refreshing this page in a few seconds.");
           }
-        } else {
-          setStatus("Email is not verified yet. Try clicking the link in your inbox again.");
-        }
+        }, 2000);
       });
     };
 
