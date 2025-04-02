@@ -48,9 +48,9 @@ export default function CoachDashboard() {
   return (
     <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 pb-24">
       {/* Header */}
-      <div className="px-4 pt-6 space-y-1">
+      <div className="px-4 pt-6 space-y-3">
         <h1 className="text-lg text-gray-800 font-medium text-center">{teamName}</h1>
-        <p className="text-5xl font-bold text-blue-800 text-left">Coach {coachName}</p>
+        <p className="text-4xl font-bold text-blue-800 text-left">Coach {coachName}</p>
       </div>
 
       {/* Progress Section */}
