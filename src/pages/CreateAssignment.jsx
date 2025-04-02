@@ -12,7 +12,7 @@ export default function CreateAssignment() {
       </div>
 
       {/* Card Buttons */}
-      <div className="flex flex-col items-center justify-center flex-grow px-4 space-y-6 mt-6">
+      <div className="flex-grow flex flex-col justify-center items-center px-4 space-y-6">
         <div
           onClick={() => navigate("/create-drill")}
           className="w-full max-w-md h-64 bg-white shadow-md rounded-2xl flex flex-col justify-center items-center cursor-pointer hover:shadow-lg transition"
