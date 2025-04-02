@@ -40,7 +40,10 @@ export default function PlayerRegister() {
       setLoading(true);
       const cred = await createUserWithEmailAndPassword(auth, parentEmail, autoPassword);
 
-      await sendEmailVerification(cred.user);
+      await sendEmailVerification(cred.user, {
+        url: "https://firstpitch-app.vercel.app/verify-check",
+        handleCodeInApp: true,
+      });
 
       await setDoc(doc(db, "players", cred.user.uid), {
         displayName: `${firstName} ${lastInitial.toUpperCase()}`,
