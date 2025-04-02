@@ -7,6 +7,7 @@ export default function PlayerRegister() {
   const [firstName, setFirstName] = useState("");
   const [lastInitial, setLastInitial] = useState("");
   const [pin, setPin] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -33,12 +34,12 @@ export default function PlayerRegister() {
       const docRef = await addDoc(collection(db, "players"), {
         displayName: `${firstName} ${lastInitial.toUpperCase()}`,
         pin,
+        parentEmail,
         teamId,
         verified: true,
         createdAt: serverTimestamp(),
       });
 
-      // Save for later use (optional)
       sessionStorage.setItem("pendingPlayerId", docRef.id);
 
       navigate("/player-home");
@@ -85,6 +86,14 @@ export default function PlayerRegister() {
           inputMode="numeric"
           pattern="\d{4}"
           maxLength={4}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Parent's email"
+          value={parentEmail}
+          onChange={(e) => setParentEmail(e.target.value)}
+          className="w-full p-2 border rounded-xl"
           required
         />
 
