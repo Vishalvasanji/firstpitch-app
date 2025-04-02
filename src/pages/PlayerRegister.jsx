@@ -7,43 +7,9 @@ export default function PlayerRegister() {
   const [firstName, setFirstName] = useState("");
   const [lastInitial, setLastInitial] = useState("");
   const [pin, setPin] = useState("");
-  const [parentEmail, setParentEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const generateVerificationCode = () =>
-    Math.floor(100000 + Math.random() * 900000).toString();
-
-  // ✅ Send email directly using Resend API (for development only)
-  const sendVerificationEmail = async (parentEmail, code) => {
-    try {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: "re_71QHCq8M_F6UEJGYTSBLpFPgEXLxY1yhj", // 🔐 Replace with your real key
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "FirstPitch <noreply@resend.dev>",
-          to: parentEmail,
-          subject: "Approve Your Child’s FirstPitch Account",
-          html: `
-            <p>Hi!</p>
-            <p>Your child is registering for FirstPitch.</p>
-            <p>To approve their account, enter this code in the app:</p>
-            <h2>${code}</h2>
-            <p>Thanks,<br>The FirstPitch Team</p>
-          `,
-        }),
-      });
-
-      const result = await response.json();
-      console.log("Resend email sent:", result);
-    } catch (error) {
-      console.error("Resend email error:", error);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,26 +29,19 @@ export default function PlayerRegister() {
       return;
     }
 
-    const verificationCode = generateVerificationCode();
-
     try {
       const docRef = await addDoc(collection(db, "players"), {
         displayName: `${firstName} ${lastInitial.toUpperCase()}`,
         pin,
-        parentEmail,
         teamId,
-        verified: false,
-        verificationCode,
+        verified: true,
         createdAt: serverTimestamp(),
       });
 
-      // Save player ID for verification screen
+      // Save for later use (optional)
       sessionStorage.setItem("pendingPlayerId", docRef.id);
 
-      // ✅ Send email
-      await sendVerificationEmail(parentEmail, verificationCode);
-
-      navigate("/verify-code");
+      navigate("/player-home");
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
@@ -126,14 +85,6 @@ export default function PlayerRegister() {
           inputMode="numeric"
           pattern="\d{4}"
           maxLength={4}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Parent's email"
-          value={parentEmail}
-          onChange={(e) => setParentEmail(e.target.value)}
-          className="w-full p-2 border rounded-xl"
           required
         />
 
