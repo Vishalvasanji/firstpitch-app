@@ -15,6 +15,36 @@ export default function PlayerRegister() {
   const generateVerificationCode = () =>
     Math.floor(100000 + Math.random() * 900000).toString();
 
+  // ✅ Send email directly using Resend API (for development only)
+  const sendVerificationEmail = async (parentEmail, code) => {
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer YOUR_RESEND_API_KEY", // 🔐 Replace with your real key
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "FirstPitch <noreply@resend.dev>",
+          to: parentEmail,
+          subject: "Approve Your Child’s FirstPitch Account",
+          html: `
+            <p>Hi!</p>
+            <p>Your child is registering for FirstPitch.</p>
+            <p>To approve their account, enter this code in the app:</p>
+            <h2>${code}</h2>
+            <p>Thanks,<br>The FirstPitch Team</p>
+          `,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Resend email sent:", result);
+    } catch (error) {
+      console.error("Resend email error:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -36,7 +66,6 @@ export default function PlayerRegister() {
     const verificationCode = generateVerificationCode();
 
     try {
-      // Save player with verificationCode
       const docRef = await addDoc(collection(db, "players"), {
         displayName: `${firstName} ${lastInitial.toUpperCase()}`,
         pin,
@@ -47,10 +76,11 @@ export default function PlayerRegister() {
         createdAt: serverTimestamp(),
       });
 
-      // ✅ Store player ID for next screen
+      // Save player ID for verification screen
       sessionStorage.setItem("pendingPlayerId", docRef.id);
 
-      // TODO: Send email with verificationCode to parentEmail (via EmailJS or similar)
+      // ✅ Send email
+      await sendVerificationEmail(parentEmail, verificationCode);
 
       navigate("/verify-code");
     } catch (err) {
