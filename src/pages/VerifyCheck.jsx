@@ -7,12 +7,37 @@ export default function VerifyCheck() {
   const [status, setStatus] = useState("Checking verification...");
 
   useEffect(() => {
-    const checkVerification = async () => {
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          setStatus("Please log in using the link in the email.");
+  const checkLinkAndVerify = async () => {
+    try {
+      // Check if the URL contains a valid sign-in link
+      if (auth.isSignInWithEmailLink(window.location.href)) {
+        const email = window.localStorage.getItem("pendingParentEmail");
+
+        if (!email) {
+          setStatus("Missing email. Please open the link from the same device.");
           return;
         }
+
+        const result = await auth.signInWithEmailLink(email, window.location.href);
+
+        if (result.user.emailVerified) {
+          await updateDoc(doc(db, "players", result.user.uid), { verified: true });
+          setStatus("✅ Email verified! Player account is now active.");
+        } else {
+          setStatus("Email is not verified yet. Try again.");
+        }
+      } else {
+        setStatus("Invalid or expired verification link.");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("Something went wrong. Try again or request a new link.");
+    }
+  };
+
+  checkLinkAndVerify();
+}, []);
+
 
         // Add 2-second delay to allow email verification to sync
         setTimeout(async () => {
