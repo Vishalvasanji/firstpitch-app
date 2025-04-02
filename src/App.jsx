@@ -5,6 +5,7 @@ import CoachDashboard from "./pages/CoachDashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import JoinTeam from "./pages/JoinTeam";
 import PlayerRegister from "./pages/PlayerRegister";
+import VerifyCheck from "./pages/VerifyCheck";
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<CoachAuthPage />} />
         <Route path="/join" element={<JoinTeam />} />
         <Route path="/player-register" element={<PlayerRegister />} />
+        <Route path="/verify-check" element={<VerifyCheck />} />
 
         <Route
           path="/create-team"
