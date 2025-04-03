@@ -7,6 +7,7 @@ import JoinTeam from "./pages/JoinTeam";
 import PlayerRegister from "./pages/PlayerRegister";
 import VerifyCode from "./pages/VerifyCode";
 import CreateAssignment from "./pages/CreateAssignment";
+import CreateDrill from "./pages/CreateDrill";
 
 function App() {
   return (
@@ -38,6 +39,14 @@ function App() {
           element={
             <PrivateRoute>
               <CreateAssignment />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/create-drill"
+          element={
+            <PrivateRoute>
+              <CreateDrill />
             </PrivateRoute>
           }
         />
