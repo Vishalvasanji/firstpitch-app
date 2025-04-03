@@ -9,7 +9,7 @@ const UserContext = createContext();
 // Custom hook
 export const useUser = () => useContext(UserContext);
 
-// Context provider
+// Provider
 export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,9 +33,10 @@ export const UserProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  return (
+   return (
     <UserContext.Provider value={{ userData, loading }}>
       {children}
     </UserContext.Provider>
   );
 };
+
