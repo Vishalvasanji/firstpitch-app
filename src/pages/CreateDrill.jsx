@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { db, storage } from "../firebase";
 import {
   collection,
   addDoc,
@@ -7,205 +8,145 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { db, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useUser } from "../context/UserContext";
+import { v4 as uuidv4 } from "uuid";
 import BottomNav from "../components/BottomNav";
+import { useUser } from "../hooks/useUser";
 
-const CreateDrill = () => {
+export default function CreateDrill() {
+  const navigate = useNavigate();
+  const { user, teamId } = useUser();
+
   const [title, setTitle] = useState("");
-  const [videoLink, setVideoLink] = useState("");
-  const [uploadFile, setUploadFile] = useState(null);
   const [instructions, setInstructions] = useState("");
+  const [videoLink, setVideoLink] = useState("");
+  const [videoFile, setVideoFile] = useState(null);
   const [dueDate, setDueDate] = useState("");
+  const [assignToTeam, setAssignToTeam] = useState(true);
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
-  const [assignToAll, setAssignToAll] = useState(true);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const { userData } = useUser();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPlayers = async () => {
-      if (!userData?.teamId) return;
-      const q = query(
-        collection(db, "players"),
-        where("teamId", "==", userData.teamId),
-        where("verified", "==", true)
-      );
+    async function fetchPlayers() {
+      if (!teamId) return;
+      const q = query(collection(db, "players"), where("teamId", "==", teamId), where("verified", "==", true));
       const snapshot = await getDocs(q);
-      const playerList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setPlayers(playerList);
-    };
-
+      const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setPlayers(list);
+    }
     fetchPlayers();
-  }, [userData?.teamId]);
+  }, [teamId]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!title.trim()) newErrors.title = true;
-    if (!instructions.trim()) newErrors.instructions = true;
-    if (!dueDate) newErrors.dueDate = true;
-    if (!assignToAll && selectedPlayers.length === 0)
-      newErrors.assignment = true;
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleDrillSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    setLoading(true);
-    try {
-      let videoUrl = videoLink;
-
-      if (uploadFile) {
-        const storageRef = ref(storage, `drills/${uploadFile.name}`);
-        await uploadBytes(storageRef, uploadFile);
-        videoUrl = await getDownloadURL(storageRef);
-      }
-
-      const drillData = {
-        title,
-        videoUrl,
-        instructions,
-        dueDate,
-        teamId: userData.teamId,
-        createdBy: userData.uid,
-        createdAt: new Date(),
-        assignedTo: assignToAll
-          ? "all"
-          : selectedPlayers.map((player) => player.id),
-      };
-
-      await addDoc(collection(db, "drills"), drillData);
-      navigate("/drills");
-    } catch (error) {
-      console.error("Error creating drill:", error);
-    } finally {
-      setLoading(false);
+  const handleUpload = (e) => {
+    if (e.target.files[0]) {
+      setVideoFile(e.target.files[0]);
     }
   };
 
-  const togglePlayerSelection = (player) => {
-    if (selectedPlayers.some((p) => p.id === player.id)) {
-      setSelectedPlayers(selectedPlayers.filter((p) => p.id !== player.id));
-    } else {
-      setSelectedPlayers([...selectedPlayers, player]);
+  const handleSubmit = async () => {
+    if (!title || !instructions || !dueDate || (!assignToTeam && selectedPlayers.length === 0)) {
+      alert("Please complete all required fields.");
+      return;
     }
+
+    let finalVideoLink = videoLink;
+
+    if (videoFile) {
+      const storageRef = ref(storage, `drill-videos/${uuidv4()}`);
+      await uploadBytes(storageRef, videoFile);
+      finalVideoLink = await getDownloadURL(storageRef);
+    }
+
+    await addDoc(collection(db, "drills"), {
+      title,
+      instructions,
+      videoLink: finalVideoLink,
+      dueDate,
+      teamId,
+      coachId: user.uid,
+      assignedTo: assignToTeam ? "team" : selectedPlayers,
+      createdAt: new Date(),
+    });
+
+    navigate("/drills");
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-blue-50">
-      <h1 className="text-2xl font-bold text-blue-800 text-center mt-6 mb-4">
-        Create Drill
-      </h1>
-      <form onSubmit={handleDrillSubmit} className="px-4 space-y-4 mb-24">
+    <div className="min-h-screen flex flex-col justify-between pb-20">
+      <div className="p-4">
+        <h1 className="text-2xl font-bold text-center text-blue-700 mb-4">Create Drill</h1>
+
         <input
           type="text"
           placeholder="Drill Title"
-          className={`w-full px-4 py-2 border rounded-xl ${
-            errors.title ? "border-red-500" : ""
-          }`}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className="w-full border rounded-xl p-3 mb-3"
         />
 
-        <div className="flex items-center space-x-2">
+        <div className="flex gap-2 mb-3">
           <input
             type="text"
             placeholder="Paste video link"
-            className="flex-1 px-4 py-2 border rounded-xl"
             value={videoLink}
             onChange={(e) => setVideoLink(e.target.value)}
+            className="flex-grow border rounded-xl p-3"
           />
-          <label className="bg-blue-600 text-white px-4 py-2 rounded-xl cursor-pointer">
-            Upload
-            <input
-              type="file"
-              accept="video/*"
-              className="hidden"
-              onChange={(e) => setUploadFile(e.target.files[0])}
-            />
+          <label className="bg-blue-600 text-white px-4 rounded-xl flex items-center justify-center">
+            +
+            <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
           </label>
         </div>
 
         <textarea
+          rows="4"
           placeholder="Instructions for the drill..."
-          className={`w-full px-4 py-2 border rounded-xl ${
-            errors.instructions ? "border-red-500" : ""
-          }`}
           value={instructions}
           onChange={(e) => setInstructions(e.target.value)}
+          className="w-full border rounded-xl p-3 h-32 resize-y mb-3"
         />
 
+        <label className="text-gray-600 mb-1 block ml-1">Due Date</label>
         <input
           type="date"
-          className={`w-full px-4 py-2 border rounded-xl ${
-            errors.dueDate ? "border-red-500" : ""
-          }`}
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
+          className="w-full border rounded-xl p-3 mb-3"
         />
 
-        <div>
-          <div
-            className={`px-4 py-3 rounded-xl border font-medium text-center mb-2 ${
-              assignToAll ? "bg-blue-100 border-blue-500" : "bg-white"
-            } ${errors.assignment ? "border-red-500" : ""}`}
-            onClick={() => {
-              setAssignToAll(true);
-              setErrors((prev) => ({ ...prev, assignment: false }));
-            }}
-          >
-            Assign to Entire Team
-          </div>
-          <p
-            className="text-sm text-blue-700 underline text-center cursor-pointer"
-            onClick={() => setAssignToAll(false)}
-          >
-            Or assign to specific players
-          </p>
+        <div className="border rounded-xl p-4 mb-2 bg-blue-100 text-center font-semibold" onClick={() => setAssignToTeam(true)}>
+          Assign to Entire Team
         </div>
 
-        {!assignToAll && (
-          <div className="space-y-2">
-            {players.map((player) => (
-              <div
-                key={player.id}
-                className={`px-4 py-3 rounded-xl border cursor-pointer ${
-                  selectedPlayers.some((p) => p.id === player.id)
-                    ? "bg-blue-100 border-blue-500"
-                    : "bg-white"
-                }`}
-                onClick={() => {
-                  togglePlayerSelection(player);
-                  setErrors((prev) => ({ ...prev, assignment: false }));
-                }}
-              >
-                {player.firstName} {player.lastName.charAt(0)}
-              </div>
-            ))}
+        <p className="text-center text-sm text-blue-700 mb-2 underline" onClick={() => setAssignToTeam(false)}>
+          Or assign to specific players
+        </p>
+
+        {!assignToTeam && players.map((p) => (
+          <div
+            key={p.id}
+            onClick={() =>
+              setSelectedPlayers((prev) =>
+                prev.includes(p.id)
+                  ? prev.filter((id) => id !== p.id)
+                  : [...prev, p.id]
+              )
+            }
+            className={`border rounded-xl p-3 mb-2 ${selectedPlayers.includes(p.id) ? "bg-blue-200" : ""}`}
+          >
+            {p.firstName} {p.lastInitial}
           </div>
-        )}
+        ))}
 
         <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold"
-          disabled={loading}
+          onClick={handleSubmit}
+          className="w-full bg-blue-600 text-white rounded-xl py-3 mt-4"
         >
-          {loading ? "Sending..." : "Send Drill"}
+          Send Drill
         </button>
-      </form>
+      </div>
 
       <BottomNav />
     </div>
   );
-};
-
-export default CreateDrill;
+}
