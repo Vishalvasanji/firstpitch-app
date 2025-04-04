@@ -17,16 +17,16 @@ export default function CreateAssignment() {
           onClick={() => navigate("/create-drill")}
           className="w-full max-w-md h-32 bg-white shadow-md rounded-2xl flex flex-col justify-center items-center cursor-pointer hover:shadow-lg transition mx-auto"
         >
-          <h2 className="text-lg font-semibold text-gray-800">Create Drill</h2>
-          <p className="text-sm text-gray-500 mt-1">Upload or link a video-based drill</p>
+          <h2 className="text-2xl font-semibold text-gray-800">Create Drill</h2>
+          <p className="text-md text-gray-500 mt-1">Upload or link a video-based drill</p>
         </div>
 
         <div
           onClick={() => navigate("/create-quiz")}
           className="w-full max-w-md h-32 bg-white shadow-md rounded-2xl flex flex-col justify-center items-center cursor-pointer hover:shadow-lg transition mx-auto"
         >
-          <h2 className="text-lg font-semibold text-gray-800">Create Quiz</h2>
-          <p className="text-sm text-gray-500 mt-1">Build a knowledge-based quiz for players</p>
+          <h2 className="text-2xl font-semibold text-gray-800">Create Quiz</h2>
+          <p className="text-md text-gray-500 mt-1">Build a knowledge-based quiz for players</p>
         </div>
       </div>
 
