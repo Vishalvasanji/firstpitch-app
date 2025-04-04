@@ -1,76 +1,81 @@
 import { useEffect, useState } from "react";
-import { getAuth } from "firebase/auth";
-import { db } from "../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
 import BottomNav from "../components/BottomNav";
 
 export default function CoachDashboard() {
-  const [coachName, setCoachName] = useState("Coach");
-  const [teamName, setTeamName] = useState("Your Team");
-  const [drillProgress, setDrillProgress] = useState({ completed: 3, total: 5 });
-  const [quizProgress, setQuizProgress] = useState({ completed: 1, total: 3 });
-  const [activity, setActivity] = useState([
-    { id: 1, type: "completed", name: "Aiden R", message: "completed 'Throwing Basics'" },
-    { id: 2, type: "joined", name: "Emma K", message: "joined the team" },
-    { id: 3, type: "quiz", name: "Noah M", message: "started 'Pitching Quiz #1'" },
-  ]);
+  const [drills, setDrills] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
+  const [activity, setActivity] = useState([]);
+
+  // Pull coach + team info from sessionStorage
+  const teamName = sessionStorage.getItem("currentTeamName") || "Team Name";
+  const coachName = sessionStorage.getItem("coachName") || "coach";
 
   useEffect(() => {
-    const fetchData = async () => {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) return;
+    // Example placeholders — replace with Firestore queries
+    setDrills([
+      { id: 1, title: "Base Running", completed: 2, total: 5 },
+      { id: 2, title: "Throwing Accuracy", completed: 4, total: 5 },
+    ]);
 
-      const coachRef = collection(db, "coaches");
-      const coachQuery = query(coachRef, where("uid", "==", user.uid));
-      const coachSnap = await getDocs(coachQuery);
-      const coachData = coachSnap.docs[0]?.data();
-      setCoachName(coachData?.firstName || "Coach");
-      setTeamName(coachData?.teamName || "Your Team");
-    };
+    setQuizzes([
+      { id: 1, title: "Rules of the Game", completed: 3, total: 5 },
+    ]);
 
-    fetchData();
+    setActivity([
+      { id: 1, player: "Aiden R", action: "Completed drill: Base Running" },
+      { id: 2, player: "Leo B", action: "Completed quiz: Rules of the Game" },
+    ]);
   }, []);
 
-  const ProgressCard = ({ title, completed, total }) => (
-    <div className="bg-white shadow rounded-2xl p-5 space-y-3 w-full min-h-[100px]">
-      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-      <div className="w-full bg-gray-200 rounded-full h-3">
-        <div
-          className="bg-blue-500 h-3 rounded-full"
-          style={{ width: `${(completed / total) * 100}%` }}
-        ></div>
-      </div>
-      <p className="text-sm text-gray-600">{completed} of {total} completed</p>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 pb-24">
+    <div className="min-h-screen flex flex-col pb-24 px-4">
       {/* Header */}
-      <div className="px-4 pt-6 space-y-3">
-        <h1 className="text-lg text-gray-800 font-medium text-center">{teamName}</h1>
-        <p className="text-4xl font-bold text-blue-800 text-left">Coach {coachName}</p>
+      <div className="pt-6 space-y-1">
+        <h1 className="text-center text-gray-800 font-medium text-sm">{teamName}</h1>
+        <p className="text-left text-4xl font-bold text-blue-800">Coach {coachName}</p>
       </div>
 
-      {/* Progress Section */}
-      <div className="px-4 pt-6 space-y-4">
-        <ProgressCard title="Drills Progress" completed={drillProgress.completed} total={drillProgress.total} />
-        <ProgressCard title="Quizzes Progress" completed={quizProgress.completed} total={quizProgress.total} />
+      {/* Progress Cards */}
+      <div className="mt-6 space-y-4">
+        <h2 className="text-xl font-semibold text-gray-700">Drills</h2>
+        {drills.map((drill) => {
+          const percent = (drill.completed / drill.total) * 100;
+          return (
+            <div key={drill.id} className="bg-white shadow rounded-xl p-4 space-y-2">
+              <p className="text-lg font-semibold text-gray-800">{drill.title}</p>
+              <div className="w-full bg-gray-200 h-2 rounded">
+                <div className="bg-blue-600 h-2 rounded" style={{ width: `${percent}%` }}></div>
+              </div>
+              <p className="text-sm text-gray-600">{drill.completed} of {drill.total} completed</p>
+            </div>
+          );
+        })}
+
+        <h2 className="text-xl font-semibold text-gray-700 mt-6">Quizzes</h2>
+        {quizzes.map((quiz) => {
+          const percent = (quiz.completed / quiz.total) * 100;
+          return (
+            <div key={quiz.id} className="bg-white shadow rounded-xl p-4 space-y-2">
+              <p className="text-lg font-semibold text-gray-800">{quiz.title}</p>
+              <div className="w-full bg-gray-200 h-2 rounded">
+                <div className="bg-green-600 h-2 rounded" style={{ width: `${percent}%` }}></div>
+              </div>
+              <p className="text-sm text-gray-600">{quiz.completed} of {quiz.total} completed</p>
+            </div>
+          );
+        })}
       </div>
 
       {/* Recent Activity */}
-      <div className="px-4 pt-6 pb-8">
-        <h2 className="text-md font-semibold text-gray-700 mb-3">Recent Activity</h2>
-        <div className="space-y-2">
-          {activity.map((item) => (
-            <div key={item.id} className="flex items-start space-x-3 bg-white p-3 rounded-xl shadow">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm">
-                {item.name.split(" ").map(n => n[0]).join("")}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">Recent Activity</h2>
+        <div className="space-y-3">
+          {activity.map((a) => (
+            <div key={a.id} className="flex items-center bg-white shadow rounded-xl p-3">
+              <div className="w-10 h-10 bg-blue-100 text-blue-800 font-bold rounded-full flex items-center justify-center mr-3">
+                {a.player.split(" ").map(n => n[0]).join("")}
               </div>
-              <div className="flex-1 text-sm text-gray-800">
-                <span className="font-medium">{item.name}</span> {item.message}
-              </div>
+              <p className="text-gray-700 text-sm">{a.action}</p>
             </div>
           ))}
         </div>
