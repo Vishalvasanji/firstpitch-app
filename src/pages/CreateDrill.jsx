@@ -233,8 +233,6 @@ export default function CreateDrill() {
             Send Drill
           </button>
         </div>
-        </div>
-
         {/* Spacer to ensure visibility above fixed nav */}
         <div className="h-24" />
       </div>
