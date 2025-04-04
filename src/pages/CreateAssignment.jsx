@@ -8,7 +8,7 @@ export default function CreateAssignment() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 pb-24">
       {/* Title at the top */}
       <div className="pt-6 px-4">
-        <h1 className="text-2xl font-bold text-blue-800 text-center">Create Assignment</h1>
+        <h1 className="text-xl font-bold text-blue-800 text-center">Create Assignment</h1>
       </div>
 
       {/* Cards aligned to top with spacing */}
