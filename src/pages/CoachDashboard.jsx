@@ -28,48 +28,52 @@ export default function CoachDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col pb-24 px-4">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 pb-24 px-4">
       {/* Header */}
       <div className="pt-6 space-y-1">
-        <h1 className="text-center text-gray-800 font-medium text-sm">{teamName}</h1>
-        <p className="text-left text-4xl font-bold text-blue-800">Coach {coachName}</p>
+        <p className="text-center text-4xl font-bold text-blue-800">Coach {coachName}</p>
+        <h1 className="text-center text-lg text-gray-800">{teamName}</h1>
       </div>
 
       {/* Progress Cards */}
-      <div className="mt-6 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-700">Drills</h2>
-        {drills.map((drill) => {
-          const percent = (drill.completed / drill.total) * 100;
-          return (
-            <div key={drill.id} className="bg-white shadow rounded-xl p-4 space-y-2">
-              <p className="text-lg font-semibold text-gray-800">{drill.title}</p>
-              <div className="w-full bg-gray-200 h-2 rounded">
-                <div className="bg-blue-600 h-2 rounded" style={{ width: `${percent}%` }}></div>
+      <div className="mt-6 space-y-6">
+        <h2 className="text-xl font-semibold text-gray-700 mb-6">Drills</h2>
+        <div className="space-y-4">
+          {drills.map((drill) => {
+            const percent = (drill.completed / drill.total) * 100;
+            return (
+              <div key={drill.id} className="bg-white shadow rounded-xl p-4 space-y-2">
+                <p className="text-lg font-semibold text-gray-800">{drill.title}</p>
+                <div className="w-full bg-gray-200 h-2 rounded">
+                  <div className="bg-blue-600 h-2 rounded" style={{ width: `${percent}%` }}></div>
+                </div>
+                <p className="text-sm text-gray-600">{drill.completed} of {drill.total} completed</p>
               </div>
-              <p className="text-sm text-gray-600">{drill.completed} of {drill.total} completed</p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
-        <h2 className="text-xl font-semibold text-gray-700 mt-6">Quizzes</h2>
-        {quizzes.map((quiz) => {
-          const percent = (quiz.completed / quiz.total) * 100;
-          return (
-            <div key={quiz.id} className="bg-white shadow rounded-xl p-4 space-y-2">
-              <p className="text-lg font-semibold text-gray-800">{quiz.title}</p>
-              <div className="w-full bg-gray-200 h-2 rounded">
-                <div className="bg-green-600 h-2 rounded" style={{ width: `${percent}%` }}></div>
+        <h2 className="text-xl font-semibold text-gray-700 mt-6 mb-6">Quizzes</h2>
+        <div className="space-y-4">
+          {quizzes.map((quiz) => {
+            const percent = (quiz.completed / quiz.total) * 100;
+            return (
+              <div key={quiz.id} className="bg-white shadow rounded-xl p-4 space-y-2">
+                <p className="text-lg font-semibold text-gray-800">{quiz.title}</p>
+                <div className="w-full bg-gray-200 h-2 rounded">
+                  <div className="bg-green-600 h-2 rounded" style={{ width: `${percent}%` }}></div>
+                </div>
+                <p className="text-sm text-gray-600">{quiz.completed} of {quiz.total} completed</p>
               </div>
-              <p className="text-sm text-gray-600">{quiz.completed} of {quiz.total} completed</p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Recent Activity */}
       <div className="mt-8">
-        <h2 className="text-xl font-semibold text-gray-700 mb-2">Recent Activity</h2>
-        <div className="space-y-3">
+        <h2 className="text-xl font-semibold text-gray-700 mb-6">Recent Activity</h2>
+        <div className="space-y-4">
           {activity.map((a) => (
             <div key={a.id} className="flex items-center bg-white shadow rounded-xl p-3">
               <div className="w-10 h-10 bg-blue-100 text-blue-800 font-bold rounded-full flex items-center justify-center mr-3">
@@ -81,7 +85,10 @@ export default function CoachDashboard() {
         </div>
       </div>
 
-      <BottomNav />
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0">
+        <BottomNav />
+      </div>
     </div>
   );
 }
