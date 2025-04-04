@@ -97,7 +97,9 @@ export default function CreateDrill() {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
-        <h1 className="text-center text-2xl font-bold text-blue-700 mb-4">Create Drill</h1>
+        $1
+
+        <div className="space-y-4">
 
         <input
           type="text"
@@ -144,13 +146,17 @@ export default function CreateDrill() {
         {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
 
         <div className="mt-6 mb-4">
-          <div className="flex justify-center gap-4 mb-3">
+          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 max-w-md mx-auto">
             <button
               onClick={() => {
                 setAssignToTeam(true);
                 setSelectedPlayers([]);
               }}
-              className={`px-4 py-2 rounded-xl font-medium ${assignToTeam ? "bg-blue-600 text-white" : "bg-white border"}`}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+                assignToTeam
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-gray-100 text-gray-500"
+              }`}
             >
               Entire Team
             </button>
@@ -159,7 +165,11 @@ export default function CreateDrill() {
                 setAssignToTeam(false);
                 setSelectedPlayers([]);
               }}
-              className={`px-4 py-2 rounded-xl font-medium ${!assignToTeam ? "bg-blue-600 text-white" : "bg-white border"}`}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+                !assignToTeam
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-gray-100 text-gray-500"
+              }`}
             >
               Specific Players
             </button>
@@ -185,12 +195,8 @@ export default function CreateDrill() {
           )}
         </div>
 
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-blue-600 text-white rounded-xl py-3 mt-6"
-        >
-          Send Drill
-        </button>
+        $1
+        </div>
 
         {/* Spacer to ensure visibility above fixed nav */}
         <div className="h-24" />
