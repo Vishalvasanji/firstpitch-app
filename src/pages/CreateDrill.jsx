@@ -7,6 +7,7 @@ import {
   query,
   where,
   getDocs,
+  serverTimestamp,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
@@ -31,7 +32,10 @@ export default function CreateDrill() {
       if (!teamId) return;
       const q = query(collection(db, "players"), where("teamId", "==", teamId), where("verified", "==", true));
       const snapshot = await getDocs(q);
-      const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const list = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setPlayers(list);
     }
     fetchPlayers();
@@ -50,7 +54,6 @@ export default function CreateDrill() {
     }
 
     let finalVideoLink = videoLink;
-
     if (videoFile) {
       const storageRef = ref(storage, `drill-videos/${uuidv4()}`);
       await uploadBytes(storageRef, videoFile);
@@ -60,91 +63,118 @@ export default function CreateDrill() {
     await addDoc(collection(db, "drills"), {
       title,
       instructions,
-      videoLink: finalVideoLink,
+      videoURL: finalVideoLink,
       dueDate,
       teamId,
       coachId: user.uid,
-      assignedTo: assignToTeam ? "team" : selectedPlayers,
-      createdAt: new Date(),
+      assignedTo: assignToTeam ? "all" : selectedPlayers,
+      createdAt: serverTimestamp(),
     });
 
     navigate("/drills");
   };
 
-  return (
-    <div className="min-h-screen flex flex-col justify-between pb-20">
-      <div className="p-4">
-        <h1 className="text-2xl font-bold text-center text-blue-700 mb-4">Create Drill</h1>
+  const togglePlayer = (playerId) => {
+    setSelectedPlayers((prev) =>
+      prev.includes(playerId)
+        ? prev.filter((id) => id !== playerId)
+        : [...prev, playerId]
+    );
+  };
 
+  return (
+    <div className="min-h-screen bg-white pb-24 px-4">
+      <h1 className="text-center text-2xl font-bold text-blue-700 my-4">Create Drill</h1>
+
+      <input
+        type="text"
+        placeholder="Drill Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="w-full border rounded-xl p-3 mb-4"
+      />
+
+      <div className="flex gap-2 mb-4">
         <input
           type="text"
-          placeholder="Drill Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full border rounded-xl p-3 mb-3"
+          placeholder="Paste video link"
+          value={videoLink}
+          onChange={(e) => setVideoLink(e.target.value)}
+          className="flex-grow border rounded-xl p-3"
         />
+        <label className="bg-blue-600 text-white px-4 rounded-xl flex items-center justify-center cursor-pointer">
+          +
+          <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
+        </label>
+      </div>
 
-        <div className="flex gap-2 mb-3">
-          <input
-            type="text"
-            placeholder="Paste video link"
-            value={videoLink}
-            onChange={(e) => setVideoLink(e.target.value)}
-            className="flex-grow border rounded-xl p-3"
-          />
-          <label className="bg-blue-600 text-white px-4 rounded-xl flex items-center justify-center">
-            +
-            <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
-          </label>
-        </div>
+      <textarea
+        rows="6"
+        placeholder="Instructions for the drill..."
+        value={instructions}
+        onChange={(e) => setInstructions(e.target.value)}
+        className="w-full border rounded-xl p-3 mb-4 resize-y"
+      />
 
-        <textarea
-          rows="4"
-          placeholder="Instructions for the drill..."
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-          className="w-full border rounded-xl p-3 h-32 resize-y mb-3"
-        />
-
-        <label className="text-gray-600 mb-1 block ml-1">Due Date</label>
+      <div className="flex items-center gap-4 mb-4">
+        <label className="text-gray-700 font-medium">Due Date</label>
         <input
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          className="w-full border rounded-xl p-3 mb-3"
+          placeholder="Select Date"
+          className="border rounded-xl p-3 flex-grow"
         />
+      </div>
 
-        <div className="border rounded-xl p-4 mb-2 bg-blue-100 text-center font-semibold" onClick={() => setAssignToTeam(true)}>
+      <div className="mb-2">
+        <div
+          onClick={() => {
+            setAssignToTeam(true);
+            setSelectedPlayers([]);
+          }}
+          className={`p-4 rounded-xl shadow cursor-pointer mb-2 ${
+            assignToTeam ? "bg-blue-100 border-2 border-blue-500" : "bg-white"
+          }`}
+        >
           Assign to Entire Team
         </div>
 
-        <p className="text-center text-sm text-blue-700 mb-2 underline" onClick={() => setAssignToTeam(false)}>
-          Or assign to specific players
-        </p>
-
-        {!assignToTeam && players.map((p) => (
-          <div
-            key={p.id}
-            onClick={() =>
-              setSelectedPlayers((prev) =>
-                prev.includes(p.id)
-                  ? prev.filter((id) => id !== p.id)
-                  : [...prev, p.id]
-              )
-            }
-            className={`border rounded-xl p-3 mb-2 ${selectedPlayers.includes(p.id) ? "bg-blue-200" : ""}`}
-          >
-            {p.firstName} {p.lastInitial}
-          </div>
-        ))}
-
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-blue-600 text-white rounded-xl py-3 mt-4"
+        <div
+          onClick={() => {
+            setAssignToTeam(false);
+            setSelectedPlayers([]);
+          }}
+          className={`text-sm text-blue-600 underline text-center cursor-pointer mb-3`}
         >
-          Send Drill
-        </button>
+          Or assign to specific players
+        </div>
       </div>
+
+      {!assignToTeam && (
+        <div className="space-y-2">
+          {players.map((p) => (
+            <div
+              key={p.id}
+              onClick={() => togglePlayer(p.id)}
+              className={`p-4 rounded-xl shadow cursor-pointer ${
+                selectedPlayers.includes(p.id)
+                  ? "bg-blue-100 border-2 border-blue-500"
+                  : "bg-white"
+              }`}
+            >
+              {p.firstName} {p.lastName[0]}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button
+        onClick={handleSubmit}
+        className="w-full bg-blue-600 text-white rounded-xl py-3 mt-6"
+      >
+        Send Drill
+      </button>
 
       <BottomNav />
     </div>
