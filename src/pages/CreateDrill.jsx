@@ -118,7 +118,7 @@ export default function CreateDrill() {
         />
         {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
 
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
           <label className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center justify-center cursor-pointer">
             +
             <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
@@ -162,7 +162,7 @@ export default function CreateDrill() {
         />
         {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
   <label className="text-gray-700 font-medium">Due Date</label>
   <input
     type="date"
@@ -175,7 +175,7 @@ export default function CreateDrill() {
         {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
 
         <div className="mt-6 mb-4">
-          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 w-[75%] mx-auto">
+          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 max-w-md mx-auto">
             <button
               onClick={() => {
                 setAssignToTeam(true);
