@@ -122,7 +122,7 @@ export default function CreateDrill() {
             placeholder="Drill Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className={\`w-full border rounded-xl p-3 mb-1 \${errors.title ? "border-red-500" : ""}\`}
+            className={`w-full border rounded-xl p-3 mb-1 ${errors.title ? "border-red-500" : ""}`}
           />
           {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
 
@@ -153,7 +153,7 @@ export default function CreateDrill() {
             placeholder="Instructions for the drill..."
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
-            className={\`w-full border rounded-xl p-3 mb-1 resize-y \${errors.instructions ? "border-red-500" : ""}\`}
+            className={`w-full border rounded-xl p-3 mb-1 resize-y ${errors.instructions ? "border-red-500" : ""}`}
           />
           {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
 
@@ -164,7 +164,7 @@ export default function CreateDrill() {
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               placeholder="Select Date"
-              className={\`border rounded-xl p-3 flex-grow \${errors.dueDate ? "border-red-500" : ""}\`}
+              className={`border rounded-xl p-3 flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
             />
           </div>
           {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
@@ -176,7 +176,7 @@ export default function CreateDrill() {
                   setAssignToTeam(true);
                   setSelectedPlayers([]);
                 }}
-                className={\`flex-1 py-2 rounded-lg text-sm font-medium transition \${assignToTeam ? "bg-white text-black shadow-sm" : "bg-gray-100 text-gray-500"}\`}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${assignToTeam ? "bg-white text-black shadow-sm" : "bg-gray-100 text-gray-500"}`}
               >
                 Entire Team
               </button>
@@ -185,7 +185,7 @@ export default function CreateDrill() {
                   setAssignToTeam(false);
                   setSelectedPlayers([]);
                 }}
-                className={\`flex-1 py-2 rounded-lg text-sm font-medium transition \${!assignToTeam ? "bg-white text-black shadow-sm" : "bg-gray-100 text-gray-500"}\`}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${!assignToTeam ? "bg-white text-black shadow-sm" : "bg-gray-100 text-gray-500"}`}
               >
                 Specific Players
               </button>
@@ -197,7 +197,7 @@ export default function CreateDrill() {
                   <div
                     key={p.id}
                     onClick={() => togglePlayer(p.id)}
-                    className={\`p-4 rounded-xl shadow cursor-pointer \${selectedPlayers.includes(p.id) ? "bg-blue-100 border-2 border-blue-500" : "bg-white"}\`}
+                    className={`p-4 rounded-xl shadow cursor-pointer ${selectedPlayers.includes(p.id) ? "bg-blue-100 border-2 border-blue-500" : "bg-white"}`}
                   >
                     {p.firstName} {p.lastName[0]}
                   </div>
