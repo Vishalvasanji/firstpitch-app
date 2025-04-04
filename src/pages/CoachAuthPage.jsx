@@ -35,20 +35,33 @@ export default function CoachAuthPage() {
 
         navigate("/create-team"); // redirect after signup
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+  await signInWithEmailAndPassword(auth, email, password);
 
-        const uid = auth.currentUser.uid;
-        const docSnap = await getDoc(doc(db, "users", uid));
-        const user = docSnap.data();
+  const uid = auth.currentUser.uid;
+  const coachRef = doc(db, "coaches", uid);
+  const coachSnap = await getDoc(coachRef);
 
-        alert(`Welcome back, Coach ${user?.firstName || ""}`);
-        navigate("/dashboard");
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
+  if (coachSnap.exists()) {
+    const coachData = coachSnap.data();
+
+    sessionStorage.setItem("coachName", coachData.firstName);
+    sessionStorage.setItem("currentTeamId", coachData.teamId);
+
+    // Now get the team name using teamId
+    const teamRef = doc(db, "teams", coachData.teamId);
+    const teamSnap = await getDoc(teamRef);
+
+    if (teamSnap.exists()) {
+      sessionStorage.setItem("currentTeamName", teamSnap.data().teamName);
     }
-  };
+
+    alert(`Welcome back, Coach ${coachData.firstName}`);
+    navigate("/dashboard");
+  } else {
+    alert("Coach profile not found.");
+  }
+}
+
 
   return (
     <div className="h-full w-full bg-gradient-to-b from-white to-blue-50 flex items-center justify-center px-4">
