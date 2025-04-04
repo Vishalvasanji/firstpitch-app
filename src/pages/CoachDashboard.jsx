@@ -24,6 +24,10 @@ export default function CoachDashboard() {
     setActivity([
       { id: 1, player: "Aiden R", action: "Completed drill: Base Running" },
       { id: 2, player: "Leo B", action: "Completed quiz: Rules of the Game" },
+      { id: 3, player: "Leo B", action: "Completed quiz: Rules of the Game" },
+      { id: 4, player: "Leo B", action: "Completed quiz: Rules of the Game" },
+      { id: 5, player: "Leo B", action: "Completed quiz: Rules of the Game" },
+      { id: 6, player: "Leo B", action: "Completed quiz: Rules of the Game" },
     ]);
   }, []);
 
