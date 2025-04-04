@@ -18,30 +18,35 @@ export default function CreateTeam() {
   const [loading, setLoading] = useState(false);
 
   const handleCreateTeam = async (e) => {
-    e.preventDefault();
-    if (!teamName.trim()) return;
+  e.preventDefault();
+  if (!teamName.trim()) return;
 
-    setLoading(true);
-    const code = generateJoinCode();
-    const coachId = auth.currentUser?.uid;
+  setLoading(true);
+  const code = generateJoinCode();
+  const coachId = auth.currentUser?.uid;
 
-    try {
-      await addDoc(collection(db, "teams"), {
-        teamName,
-        coachId,
-        joinCode: code,
-        createdAt: serverTimestamp(),
-      });
+  try {
+    const teamRef = await addDoc(collection(db, "teams"), {
+      teamName,
+      coachId,
+      joinCode: code,
+      createdAt: serverTimestamp(),
+    });
 
-      setJoinCode(code);
-      setCreatedTeamName(teamName);
-    } catch (err) {
-      console.error("Error creating team:", err);
-      alert("There was a problem creating your team.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ Store team ID and name in sessionStorage
+    sessionStorage.setItem("currentTeamId", teamRef.id);
+    sessionStorage.setItem("currentTeamName", teamName);
+
+    setJoinCode(code);
+    setCreatedTeamName(teamName);
+  } catch (err) {
+    console.error("Error creating team:", err);
+    alert("There was a problem creating your team.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleShare = async () => {
     const message = `Join my FirstPitch team "${createdTeamName}" using this code: ${joinCode}`;
