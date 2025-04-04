@@ -133,7 +133,7 @@ export default function CreateDrill() {
         />
         {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
 
-        $1
+        <div className="flex items-center gap-4">
   <label className="text-gray-700 font-medium">Due Date</label>
   <input
     type="date"
