@@ -97,7 +97,7 @@ export default function CreateDrill() {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
-        $1
+        <h1 className="text-center text-2xl font-bold text-blue-700 mb-4">Create Drill</h1>
 
         <div className="space-y-4">
 
@@ -135,10 +135,7 @@ export default function CreateDrill() {
 
         <div className="flex items-center gap-4 mb-1">
           <label className="text-gray-700 font-medium">Due Date</label>
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+          $1 placeholder="Select Date"> setDueDate(e.target.value)}
             placeholder="Select Date"
             className={`border rounded-xl p-3 flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
           />
@@ -195,7 +192,12 @@ export default function CreateDrill() {
           )}
         </div>
 
-        $1
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-blue-600 text-white rounded-xl py-3 mt-6"
+        >
+          Send Drill
+        </button>
         </div>
 
         {/* Spacer to ensure visibility above fixed nav */}
