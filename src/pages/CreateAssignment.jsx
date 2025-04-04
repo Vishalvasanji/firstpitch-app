@@ -8,7 +8,7 @@ export default function CreateAssignment() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 pb-24">
       {/* Title at the top */}
       <div className="pt-6 px-4">
-        <h1 className="text-xl font-bold text-blue-800 text-center">Create Assignment</h1>
+        <h1 className="text-lg font-bold text-blue-800 text-center">Create Assignment</h1>
       </div>
 
       {/* Cards aligned to top with spacing */}
@@ -17,7 +17,7 @@ export default function CreateAssignment() {
           onClick={() => navigate("/create-drill")}
           className="w-full max-w-md h-32 bg-white shadow-md rounded-2xl flex flex-col justify-center items-center cursor-pointer hover:shadow-lg transition mx-auto"
         >
-          <h2 className="text-2xl font-semibold text-gray-800">Create Drill</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Create Drill</h2>
           <p className="text-md text-gray-500 mt-1">Upload or link a video-based drill</p>
         </div>
 
@@ -25,7 +25,7 @@ export default function CreateAssignment() {
           onClick={() => navigate("/create-quiz")}
           className="w-full max-w-md h-32 bg-white shadow-md rounded-2xl flex flex-col justify-center items-center cursor-pointer hover:shadow-lg transition mx-auto"
         >
-          <h2 className="text-2xl font-semibold text-gray-800">Create Quiz</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Create Quiz</h2>
           <p className="text-md text-gray-500 mt-1">Build a knowledge-based quiz for players</p>
         </div>
       </div>
