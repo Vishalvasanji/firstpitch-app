@@ -48,14 +48,18 @@ export default function CoachAuthPage() {
           const userData = userSnap.data();
 
           sessionStorage.setItem("coachName", userData.firstName);
-          sessionStorage.setItem("currentTeamId", userData.teamId);
+          sessionStorage.setItem("currentTeamId", userData.teamId || "");
 
-          // Pull team name from teams collection
-          const teamRef = doc(db, "teams", userData.teamId);
-          const teamSnap = await getDoc(teamRef);
+          if (userData.teamId) {
+            const teamRef = doc(db, "teams", userData.teamId);
+            const teamSnap = await getDoc(teamRef);
 
-          if (teamSnap.exists()) {
-            sessionStorage.setItem("currentTeamName", teamSnap.data().teamName);
+            if (teamSnap.exists()) {
+              sessionStorage.setItem(
+                "currentTeamName",
+                teamSnap.data().teamName
+              );
+            }
           }
 
           alert(`Welcome back, Coach ${userData.firstName}`);
