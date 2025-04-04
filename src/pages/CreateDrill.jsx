@@ -224,7 +224,12 @@ export default function CreateDrill() {
           )}
         </div>
 
-        $1
+        <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 text-white rounded-xl py-3 mt-6"
+          >
+            Send Drill
+          </button>
         </div>
         </div>
 
