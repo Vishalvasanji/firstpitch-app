@@ -142,17 +142,13 @@ export default function CreateDrill() {
   className="flex-grow border rounded-xl p-3"
 />
 
-{uploadedVideoName && (
-  <div className="mt-2 text-sm text-green-700 bg-green-100 rounded-md px-3 py-2">
-    ✅ <span className="font-medium">Uploaded:</span> {uploadedVideoName}
+{uploadedVideoUrl && uploadedVideoName && (
+  <div className="mt-2 flex items-center gap-2 text-sm text-green-700 bg-green-100 rounded-md px-3 py-2">
+    ✅ <span className="font-medium">Loaded:</span> {uploadedVideoName}
   </div>
 )}
 
-{thumbnailUrl && (
-  <div className="mt-2">
-    <img src={thumbnailUrl} alt="Video preview" className="rounded-lg w-full max-w-sm" />
-  </div>
-)}
+
 </div>
 
 <textarea
