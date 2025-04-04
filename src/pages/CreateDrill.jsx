@@ -133,13 +133,16 @@ export default function CreateDrill() {
         />
         {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
 
-        <div className="flex items-center gap-4 mb-1">
-          <label className="text-gray-700 font-medium">Due Date</label>
-          $1 placeholder="Select Date"> setDueDate(e.target.value)}
-            placeholder="Select Date"
-            className={`border rounded-xl p-3 flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
-          />
-        </div>
+        $1
+  <label className="text-gray-700 font-medium">Due Date</label>
+  <input
+    type="date"
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+    placeholder="Select Date"
+    className={`border rounded-xl p-3 flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
+  />
+</div>
         {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
 
         <div className="mt-6 mb-4">
