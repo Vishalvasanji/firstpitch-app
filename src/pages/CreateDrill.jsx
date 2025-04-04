@@ -21,6 +21,9 @@ export default function CreateDrill() {
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [videoLink, setVideoLink] = useState("");
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState("");
+  const [uploadedVideoName, setUploadedVideoName] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [dueDate, setDueDate] = useState("");
   const [assignToTeam, setAssignToTeam] = useState(true);
@@ -46,9 +49,19 @@ export default function CreateDrill() {
     fetchPlayers();
   }, [teamId]);
 
-  const handleUpload = (e) => {
-    if (e.target.files[0]) {
-      setVideoFile(e.target.files[0]);
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const storageRef = ref(storage, `drills/${Date.now()}_${file.name}`);
+    try {
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      setUploadedVideoUrl(downloadURL);
+      setUploadedVideoName(file.name);
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Upload failed. Please try again.");
     }
   };
 
@@ -65,11 +78,7 @@ export default function CreateDrill() {
       return;
     }
 
-    let finalVideoLink = videoLink;
-    if (videoFile) {
-      const storageRef = ref(storage, `drill-videos/${uuidv4()}`);
-      await uploadBytes(storageRef, videoFile);
-      finalVideoLink = await getDownloadURL(storageRef);
+    let finalVideoLink = videoLink || uploadedVideoUrl;
     }
 
     await addDoc(collection(db, "drills"), {
@@ -99,7 +108,7 @@ export default function CreateDrill() {
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
         <h1 className="text-center text-2xl font-bold text-blue-700 mb-4">Create Drill</h1>
 
-        <div className="space-y-5">
+        <div className="space-y-4">
 
         <input
           type="text"
@@ -119,12 +128,33 @@ export default function CreateDrill() {
             type="text"
             placeholder="Paste video link"
             value={videoLink}
-            onChange={(e) => setVideoLink(e.target.value)}
+            onChange={(e) => {
+              const url = e.target.value;
+              setVideoLink(url);
+              if (url.includes("youtube.com") || url.includes("youtu.be")) {
+                const videoId = url.split("v=")[1]?.split("&")[0] || url.split("/").pop();
+                setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/0.jpg`);
+              } else if (url.includes("vimeo.com")) {
+                setThumbnailUrl(""); // Extend logic for Vimeo later
+              } else {
+                setThumbnailUrl("");
+              }
+            }}
             className="flex-grow border rounded-xl p-3"
           />
-        </div>
+        {uploadedVideoName && (
+          <div className="mt-2 text-sm text-green-700 bg-green-100 rounded-md px-3 py-2">
+            ✅ <span className="font-medium">Uploaded:</span> {uploadedVideoName}
+          </div>
+        )}
 
-        <textarea
+        {thumbnailUrl && (
+          <div className="mt-2">
+            <img src={thumbnailUrl} alt="Video preview" className="rounded-lg w-full max-w-sm" />
+          </div>
+        )}
+
+        $1
           rows="6"
           placeholder="Instructions for the drill..."
           value={instructions}
