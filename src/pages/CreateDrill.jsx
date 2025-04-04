@@ -118,7 +118,7 @@ export default function CreateDrill() {
         />
         {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-4">
           <label className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center justify-center cursor-pointer">
             +
             <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
