@@ -119,41 +119,10 @@ export default function CreateDrill() {
         {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
 
         <div className="flex items-center gap-2 mb-4">
-          <label className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center justify-center cursor-pointer">
-            +
-            <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
-          </label>
-          <input
-            type="text"
-            placeholder="Paste video link"
-            value={videoLink}
-            onChange={(e) => {
-              const url = e.target.value;
-              setVideoLink(url);
-              if (url.includes("youtube.com") || url.includes("youtu.be")) {
-                const videoId = url.split("v=")[1]?.split("&")[0] || url.split("/").pop();
-                setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/0.jpg`);
-              } else if (url.includes("vimeo.com")) {
-                setThumbnailUrl(""); // Extend logic for Vimeo later
-              } else {
-                setThumbnailUrl("");
-              }
-            }}
-            className="flex-grow border rounded-xl p-3"
-          />
-        {uploadedVideoName && (
-          <div className="mt-2 text-sm text-green-700 bg-green-100 rounded-md px-3 py-2">
-            ✅ <span className="font-medium">Uploaded:</span> {uploadedVideoName}
-          </div>
-        )}
+$1
+</div>
 
-        {thumbnailUrl && (
-          <div className="mt-2">
-            <img src={thumbnailUrl} alt="Video preview" className="rounded-lg w-full max-w-sm" />
-          </div>
-        )}
-
-        <textarea
+<textarea
           rows="6"
           placeholder="Instructions for the drill..."
           value={instructions}
@@ -162,7 +131,7 @@ export default function CreateDrill() {
         />
         {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+        <div className="flex items-center gap-2 mb-2">
   <label className="text-gray-700 font-medium">Due Date</label>
   <input
     type="date"
