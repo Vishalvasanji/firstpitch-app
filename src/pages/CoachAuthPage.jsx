@@ -37,7 +37,7 @@ export default function CoachAuthPage() {
 
         sessionStorage.setItem("coachName", firstName);
         alert("Account created successfully!");
-        navigate("/createteam");
+        navigate("/create-team");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
 
