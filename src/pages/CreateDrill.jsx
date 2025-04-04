@@ -23,8 +23,7 @@ export default function CreateDrill() {
   const [videoLink, setVideoLink] = useState("");
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState("");
   const [uploadedVideoName, setUploadedVideoName] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [videoFile, setVideoFile] = useState(null);
+    const [videoFile, setVideoFile] = useState(null);
   const [dueDate, setDueDate] = useState("");
   const [assignToTeam, setAssignToTeam] = useState(true);
   const [players, setPlayers] = useState([]);
@@ -130,21 +129,14 @@ export default function CreateDrill() {
   onChange={(e) => {
     const url = e.target.value;
     setVideoLink(url);
-    if (url.includes("youtube.com") || url.includes("youtu.be")) {
-      const videoId = url.split("v=")[1]?.split("&")[0] || url.split("/").pop();
-      setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/0.jpg`);
-    } else if (url.includes("vimeo.com")) {
-      setThumbnailUrl("");
-    } else {
-      setThumbnailUrl("");
-    }
+    
   }}
   className="flex-grow border rounded-xl p-3"
 />
 
-{uploadedVideoUrl && uploadedVideoName && (
+{uploadedVideoUrl && (
   <div className="mt-2 flex items-center gap-2 text-sm text-green-700 bg-green-100 rounded-md px-3 py-2">
-    ✅ <span className="font-medium">Loaded:</span> {uploadedVideoName}
+    ✅ <span className="font-medium">Video successfully loaded</span>
   </div>
 )}
 
