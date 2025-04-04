@@ -153,7 +153,7 @@ export default function CreateDrill() {
           </div>
         )}
 
-        $1
+        <textarea
           rows="6"
           placeholder="Instructions for the drill..."
           value={instructions}
