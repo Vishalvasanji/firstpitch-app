@@ -40,12 +40,12 @@ export default function CoachDashboard() {
   const quizPercent = totalQuizzes > 0 ? (completedQuizzes / totalQuizzes) * 100 : 0;
 
   return (
-    <>
-      <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
+    <div className="h-screen flex flex-col">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
         {/* Header */}
-        <div className="space-y-2">
-          <p className="text-center text-4xl font-bold text-blue-800">Coach {coachName}</p>
-          <h1 className="text-center text-lg font-bold text-gray-800">{teamName}</h1>
+        <div className="space-y-1">
+          <p className="text-left text-4xl font-bold text-blue-800">Coach {coachName}</p>
+          <h1 className="text-left text-lg font-bold text-gray-800">{teamName}</h1>
         </div>
 
         {/* Drill Summary */}
@@ -88,6 +88,6 @@ export default function CoachDashboard() {
       <div className="fixed bottom-0 left-0 right-0">
         <BottomNav />
       </div>
-    </>
+    </div>
   );
 }
