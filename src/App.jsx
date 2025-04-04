@@ -21,9 +21,9 @@ function App() {
         <Route
           path="/create-team"
           element={
-            <PrivateRoute>
+            
               <CreateTeam />
-            </PrivateRoute>
+          
           }
         />
         <Route
