@@ -119,7 +119,40 @@ export default function CreateDrill() {
         {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
 
         <div className="flex items-center gap-2 mb-4">
-$1
+<label className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center justify-center cursor-pointer">
+  +
+  <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
+</label>
+<input
+  type="text"
+  placeholder="Paste video link"
+  value={videoLink}
+  onChange={(e) => {
+    const url = e.target.value;
+    setVideoLink(url);
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      const videoId = url.split("v=")[1]?.split("&")[0] || url.split("/").pop();
+      setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/0.jpg`);
+    } else if (url.includes("vimeo.com")) {
+      setThumbnailUrl("");
+    } else {
+      setThumbnailUrl("");
+    }
+  }}
+  className="flex-grow border rounded-xl p-3"
+/>
+
+{uploadedVideoName && (
+  <div className="mt-2 text-sm text-green-700 bg-green-100 rounded-md px-3 py-2">
+    ✅ <span className="font-medium">Uploaded:</span> {uploadedVideoName}
+  </div>
+)}
+
+{thumbnailUrl && (
+  <div className="mt-2">
+    <img src={thumbnailUrl} alt="Video preview" className="rounded-lg w-full max-w-sm" />
+  </div>
+)}
 </div>
 
 <textarea
@@ -144,7 +177,7 @@ $1
         {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
 
         <div className="mt-6 mb-4">
-          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 max-w-md mx-auto">
+          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 w-[75%] mx-auto">
             <button
               onClick={() => {
                 setAssignToTeam(true);
