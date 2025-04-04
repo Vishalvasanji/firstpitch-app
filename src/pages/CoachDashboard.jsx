@@ -40,8 +40,8 @@ export default function CoachDashboard() {
       <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
         {/* Header */}
         <div className="space-y-1">
-          <p className="text-left text-4xl font-bold text-blue-800">Coach {coachName}</p>
-          <h1 className="text-left text-lg text-gray-800">{teamName}</h1>
+          <p className="text-center text-4xl font-bold text-blue-800">Coach {coachName}</p>
+          <h1 className="text-center text-lg text-gray-800">{teamName}</h1>
         </div>
 
         {/* Drill Summary */}
