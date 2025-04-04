@@ -13,6 +13,7 @@ export default function CoachAuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,9 +28,9 @@ export default function CoachAuthPage() {
 
         const uid = userCredential.user.uid;
 
-        // Save coach to users collection
         await setDoc(doc(db, "users", uid), {
           firstName,
+          lastName, // ✅ Save but not displayed
           email,
           createdAt: new Date(),
         });
@@ -85,14 +86,24 @@ export default function CoachAuthPage() {
         </h2>
 
         {isRegistering && (
-          <input
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
+          <>
+            <input
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full p-3 border rounded-xl"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full p-3 border rounded-xl"
+              required
+            />
+          </>
         )}
 
         <input
