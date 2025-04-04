@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { auth, db } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 
 function generateJoinCode(length = 6) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -18,35 +24,43 @@ export default function CreateTeam() {
   const [loading, setLoading] = useState(false);
 
   const handleCreateTeam = async (e) => {
-  e.preventDefault();
-  if (!teamName.trim()) return;
+    e.preventDefault();
+    if (!teamName.trim()) return;
 
-  setLoading(true);
-  const code = generateJoinCode();
-  const coachId = auth.currentUser?.uid;
+    setLoading(true);
+    const code = generateJoinCode();
+    const coachId = auth.currentUser?.uid;
 
-  try {
-    const teamRef = await addDoc(collection(db, "teams"), {
-      teamName,
-      coachId,
-      joinCode: code,
-      createdAt: serverTimestamp(),
-    });
+    try {
+      const teamRef = await addDoc(collection(db, "teams"), {
+        teamName,
+        coachId,
+        joinCode: code,
+        createdAt: serverTimestamp(),
+      });
 
-    // ✅ Store team ID and name in sessionStorage
-    sessionStorage.setItem("currentTeamId", teamRef.id);
-    sessionStorage.setItem("currentTeamName", teamName);
+      // Save teamId and name to session
+      sessionStorage.setItem("currentTeamId", teamRef.id);
+      sessionStorage.setItem("currentTeamName", teamName);
 
-    setJoinCode(code);
-    setCreatedTeamName(teamName);
-  } catch (err) {
-    console.error("Error creating team:", err);
-    alert("There was a problem creating your team.");
-  } finally {
-    setLoading(false);
-  }
-};
+      // Update coach's user document with teamId
+      await setDoc(
+        doc(db, "users", coachId),
+        {
+          teamId: teamRef.id,
+        },
+        { merge: true }
+      );
 
+      setJoinCode(code);
+      setCreatedTeamName(teamName);
+    } catch (err) {
+      console.error("Error creating team:", err);
+      alert("There was a problem creating your team.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleShare = async () => {
     const message = `Join my FirstPitch team "${createdTeamName}" using this code: ${joinCode}`;
@@ -73,10 +87,9 @@ export default function CreateTeam() {
   if (joinCode) {
     return (
       <div className="h-full w-full flex flex-col items-center justify-center text-center px-6 bg-gradient-to-b from-white to-blue-50 relative">
-
         {/* X button in top-right */}
         <button
-          onClick={() => window.location.href = "/dashboard"}
+          onClick={() => (window.location.href = "/dashboard")}
           className="absolute top-4 right-4 text-2xl text-gray-500 hover:text-gray-800"
           aria-label="Close"
         >
@@ -97,14 +110,19 @@ export default function CreateTeam() {
           Share Code
         </button>
 
-        <p className="text-sm text-gray-500">They’ll need it to register and join your team.</p>
+        <p className="text-sm text-gray-500">
+          They’ll need it to register and join your team.
+        </p>
       </div>
     );
   }
 
   return (
     <div className="h-full w-full flex items-center justify-center px-4 bg-gradient-to-b from-white to-blue-50">
-      <form onSubmit={handleCreateTeam} className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl space-y-4">
+      <form
+        onSubmit={handleCreateTeam}
+        className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl space-y-4"
+      >
         <h2 className="text-xl font-semibold text-center text-gray-800">Create Your Team</h2>
         <input
           type="text"
