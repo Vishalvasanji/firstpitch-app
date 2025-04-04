@@ -177,7 +177,7 @@ export default function CreateDrill() {
         {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
 
         <div className="mt-6 mb-4">
-          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 w-[75%] mx-auto">
+          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 w-[80%] mx-auto">
             <button
               onClick={() => {
                 setAssignToTeam(true);
@@ -207,7 +207,7 @@ export default function CreateDrill() {
           </div>
 
           {!assignToTeam && (
-            <div className="space-y-2 max-w-md mx-auto">
+            <div className="space-y-4 max-w-md mx-auto">
               {players.map((p) => (
                 <div
                   key={p.id}
