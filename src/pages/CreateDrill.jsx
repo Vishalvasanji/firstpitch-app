@@ -79,7 +79,6 @@ export default function CreateDrill() {
     }
 
     let finalVideoLink = videoLink || uploadedVideoUrl;
-    }
 
     await addDoc(collection(db, "drills"), {
       title,
