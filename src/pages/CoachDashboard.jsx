@@ -41,7 +41,7 @@ export default function CoachDashboard() {
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6" style={{ paddingBottom: '6rem' }}>
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
         {/* Header */}
         <div className="space-y-1">
           <p className="text-center text-4xl font-bold text-blue-800">Coach {coachName}</p>
@@ -82,6 +82,9 @@ export default function CoachDashboard() {
             ))}
           </div>
         </div>
+
+        {/* Bottom Spacer to prevent clipping */}
+        <div className="h-24" />
       </div>
 
       {/* Bottom Navigation */}
