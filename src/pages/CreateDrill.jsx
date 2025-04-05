@@ -18,8 +18,9 @@ export default function CreateDrill() {
   
   if (!teamId) {
     return <div className="p-6 text-center text-gray-500">Loading team data...</div>;
-  
-    const [title, setTitle] = useState("");
+  }
+    
+  const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [videoLink, setVideoLink] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
