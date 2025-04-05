@@ -15,10 +15,8 @@ import { useUser } from "../hooks/useUser";
 export default function CreateDrill() {
   const navigate = useNavigate();
   const { user, teamId } = useUser();
-  
-  if (!teamId) {
-    return <div className="p-6 text-center text-gray-500">Loading team data...</div>;
-  }
+
+  console.log("✅ teamId loaded?", teamId);
     
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
