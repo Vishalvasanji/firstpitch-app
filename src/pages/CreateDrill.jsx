@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
 import {
   collection,
   addDoc,
@@ -9,7 +9,6 @@ import {
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
-import { v4 as uuidv4 } from "uuid";
 import BottomNav from "../components/BottomNav";
 import { useUser } from "../hooks/useUser";
 
@@ -58,12 +57,10 @@ export default function CreateDrill() {
       return;
     }
 
-    let finalVideoLink = videoLink;
-
     await addDoc(collection(db, "drills"), {
       title,
       instructions,
-      videoURL: finalVideoLink,
+      videoURL: videoLink,
       dueDate,
       teamId,
       coachId: user.uid,
@@ -82,13 +79,28 @@ export default function CreateDrill() {
     );
   };
 
+  const handleVideoLinkChange = (e) => {
+    const url = e.target.value;
+    setVideoLink(url);
+
+    const rawId = url.includes("v=")
+      ? url.split("v=")[1]?.split("&")[0]
+      : url.split("/").pop()?.split("?")[0];
+
+    const videoId = rawId?.trim();
+    if (videoId) {
+      setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/0.jpg`);
+    } else {
+      setThumbnailUrl("");
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
         <h1 className="text-center text-2xl font-bold text-blue-700 mb-4">Create Drill</h1>
 
         <div className="space-y-4">
-
           <input
             type="text"
             placeholder="Drill Title"
@@ -98,24 +110,13 @@ export default function CreateDrill() {
           />
           {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
 
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="text"
-              placeholder="Paste video link"
-              value={videoLink}
-              onChange={(e) => {
-                const url = e.target.value;
-                setVideoLink(url);
-                if (url.includes("youtube.com") || url.includes("youtu.be")) {
-                  const videoId = url.split("v=")[1]?.split("&")[0] || url.split("/").pop();
-                  setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/0.jpg`);
-                } else {
-                  setThumbnailUrl("");
-                }
-              }}
-              className="flex-grow border rounded-xl p-3"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Paste video link"
+            value={videoLink}
+            onChange={handleVideoLinkChange}
+            className="w-full border rounded-xl p-3"
+          />
 
           {thumbnailUrl && (
             <div className="mt-3">
@@ -202,11 +203,9 @@ export default function CreateDrill() {
           </button>
         </div>
 
-        {/* Spacer to ensure visibility above fixed nav */}
         <div className="h-24" />
       </div>
 
-      {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0">
         <BottomNav />
       </div>
