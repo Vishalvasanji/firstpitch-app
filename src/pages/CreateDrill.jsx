@@ -119,11 +119,11 @@ export default function CreateDrill() {
           />
 
           {thumbnailUrl && (
-            <div className="mt-3">
+            <div className="mt-3 aspect-video w-full max-w-sm overflow-hidden rounded-lg shadow-md">
               <img
                 src={thumbnailUrl}
                 alt="Video preview"
-                className="rounded-lg shadow-md w-full max-w-sm"
+                className="object-cover w-full h-full"
               />
             </div>
           )}
