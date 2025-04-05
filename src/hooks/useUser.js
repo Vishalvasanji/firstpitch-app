@@ -12,9 +12,9 @@ export function useUser() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const coachDoc = await getDoc(doc(db, "coaches", currentUser.uid));
-        if (coachDoc.exists()) {
-          setTeamId(coachDoc.data().teamId);
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (userDoc.exists()) {
+          setTeamId(userDoc.data().teamId);
         }
       } else {
         setUser(null);
