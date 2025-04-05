@@ -56,14 +56,21 @@ export default function CreateDrill() {
       return;
     }
 
-    await addDoc(collection(db, "drills"), {
+    const drillRef = await addDoc(collection(db, "drills"), {
       title,
       instructions,
-      videoURL: videoLink,
-      dueDate,
+      videoUrl: videoLink,
       teamId,
-      coachId: user.uid,
+      createdBy: user?.uid,
+      createdAt: serverTimestamp(),
+    });
+
+    await addDoc(collection(db, "assignments"), {
+      contentId: drillRef.id,
+      teamId,
+      dueDate,
       assignedTo: assignToTeam ? "all" : selectedPlayers,
+      type: "drill",
       createdAt: serverTimestamp(),
     });
 
