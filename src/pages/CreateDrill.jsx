@@ -14,10 +14,7 @@ import { useUser } from "../hooks/useUser";
 
 export default function CreateDrill() {
   const navigate = useNavigate();
-  const { user, teamId } = useUser();
-
-  console.log("✅ teamId loaded?", teamId);
-    
+  const { user, teamId } = useUser(); 
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [videoLink, setVideoLink] = useState("");
