@@ -116,9 +116,6 @@ export default function CreateDrill() {
   className="flex-grow border rounded-xl p-3"
 />
 
-
-
-$1
 {thumbnailUrl && (
   <div className="mt-3">
     <img
