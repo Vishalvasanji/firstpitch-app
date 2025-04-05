@@ -9,7 +9,6 @@ import {
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import BottomNav from "../components/BottomNav";
 import { useUser } from "../hooks/useUser";
@@ -21,15 +20,12 @@ export default function CreateDrill() {
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [videoLink, setVideoLink] = useState("");
-  const [uploadedVideoUrl, setUploadedVideoUrl] = useState("");
-  const [uploadedVideoName, setUploadedVideoName] = useState("");
-  const [videoFile, setVideoFile] = useState(null);
-  const [dueDate, setDueDate] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
+          const [dueDate, setDueDate] = useState("");
   const [assignToTeam, setAssignToTeam] = useState(true);
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [errors, setErrors] = useState({});
-  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     async function fetchPlayers() {
@@ -49,32 +45,7 @@ export default function CreateDrill() {
     fetchPlayers();
   }, [teamId]);
 
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0];
-
-    if (!file || !file.type.startsWith("video/")) {
-      alert("Please select a valid video file.");
-      console.warn("Upload aborted: invalid or missing file.", file);
-      return;
-    }
-
-    setUploading(true);
-    const storageRef = ref(storage, `drills/${Date.now()}_${file.name}`);
-    try {
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      setUploadedVideoUrl(downloadURL);
-      setUploadedVideoName(file.name);
-      console.log("✅ Upload successful:", downloadURL);
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Upload failed. Please try again.");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
+    const handleSubmit = async () => {
     const newErrors = {};
     if (!title) newErrors.title = "Title is required.";
     if (!instructions) newErrors.instructions = "Instructions are required.";
@@ -87,7 +58,7 @@ export default function CreateDrill() {
       return;
     }
 
-    let finalVideoLink = videoLink || uploadedVideoUrl;
+    let finalVideoLink = videoLink;
 
     await addDoc(collection(db, "drills"), {
       title,
@@ -117,106 +88,130 @@ export default function CreateDrill() {
         <h1 className="text-center text-2xl font-bold text-blue-700 mb-4">Create Drill</h1>
 
         <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Drill Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className={`w-full border rounded-xl p-3 mb-1 ${errors.title ? "border-red-500" : ""}`}
-          />
-          {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
 
-          <div className="flex items-center gap-2 mb-4">
-            <label className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center justify-center cursor-pointer">
-              +
-              <input type="file" accept="video/*" onChange={handleUpload} className="hidden" />
-            </label>
-            <input
-              type="text"
-              placeholder="Paste video link"
-              value={videoLink}
-              onChange={(e) => setVideoLink(e.target.value)}
-              className="flex-grow border rounded-xl p-3"
-            />
+        <input
+          type="text"
+          placeholder="Drill Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className={`w-full border rounded-xl p-3 mb-1 ${errors.title ? "border-red-500" : ""}`}
+        />
+        {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title}</p>}
+
+        <div className="flex items-center gap-2 mb-4">
+<input
+  type="text"
+  placeholder="Paste video link"
+  value={videoLink}
+  onChange={(e) => {
+    const url = e.target.value;
+    setVideoLink(url);
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      const videoId = url.split("v=")[1]?.split("&")[0] || url.split("/").pop();
+      setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/0.jpg`);
+    } else {
+      setThumbnailUrl("");
+    }
+  }}
+  className="flex-grow border rounded-xl p-3"
+/>
+
+
+
+$1
+{thumbnailUrl && (
+  <div className="mt-3">
+    <img
+      src={thumbnailUrl}
+      alt="Video preview"
+      className="rounded-lg shadow-md w-full max-w-sm"
+    />
+  </div>
+)}
+
+<textarea
+          rows="6"
+          placeholder="Instructions for the drill..."
+          value={instructions}
+          onChange={(e) => setInstructions(e.target.value)}
+          className={`w-full border rounded-xl p-3 mb-1 resize-y ${errors.instructions ? "border-red-500" : ""}`}
+        />
+        {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
+
+        <div className="flex items-center gap-2 mb-2">
+  <label className="text-gray-700 font-medium">Due Date</label>
+  <input
+    type="date"
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+    placeholder="Select Date"
+    className={`border rounded-xl p-3 flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
+  />
+</div>
+        {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
+
+        <div className="mt-6 mb-4">
+          <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 w-[80%] mx-auto">
+            <button
+              onClick={() => {
+                setAssignToTeam(true);
+                setSelectedPlayers([]);
+              }}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+                assignToTeam
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-gray-100 text-gray-500"
+              }`}
+            >
+              Entire Team
+            </button>
+            <button
+              onClick={() => {
+                setAssignToTeam(false);
+                setSelectedPlayers([]);
+              }}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+                !assignToTeam
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-gray-100 text-gray-500"
+              }`}
+            >
+              Specific Players
+            </button>
           </div>
 
-          {uploading && <p className="text-blue-600 text-sm">Uploading video...</p>}
-
-          {uploadedVideoUrl && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-green-700 bg-green-100 rounded-md px-3 py-2">
-              ✅ <span className="font-medium">Video successfully loaded</span>
+          {!assignToTeam && (
+            <div className="space-y-4 max-w-md mx-auto">
+              {players.map((p) => (
+                <div
+                  key={p.id}
+                  onClick={() => togglePlayer(p.id)}
+                  className={`p-4 rounded-xl shadow cursor-pointer ${
+                    selectedPlayers.includes(p.id)
+                      ? "bg-blue-100 border-2 border-blue-500"
+                      : "bg-white"
+                  }`}
+                >
+                  {p.firstName} {p.lastName[0]}
+                </div>
+              ))}
+              {errors.players && <p className="text-red-500 text-sm mt-2">{errors.players}</p>}
             </div>
           )}
+        </div>
 
-          <textarea
-            rows="6"
-            placeholder="Instructions for the drill..."
-            value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
-            className={`w-full border rounded-xl p-3 mb-1 resize-y ${errors.instructions ? "border-red-500" : ""}`}
-          />
-          {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
-
-          <div className="flex items-center gap-2 mb-2">
-            <label className="text-gray-700 font-medium">Due Date</label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              placeholder="Select Date"
-              className={`border rounded-xl p-3 flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
-            />
-          </div>
-          {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
-
-          <div className="mt-6 mb-4">
-            <div className="bg-white rounded-xl p-1 flex gap-1 mb-4 w-[80%] mx-auto">
-              <button
-                onClick={() => {
-                  setAssignToTeam(true);
-                  setSelectedPlayers([]);
-                }}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${assignToTeam ? "bg-white text-black shadow-sm" : "bg-gray-100 text-gray-500"}`}
-              >
-                Entire Team
-              </button>
-              <button
-                onClick={() => {
-                  setAssignToTeam(false);
-                  setSelectedPlayers([]);
-                }}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${!assignToTeam ? "bg-white text-black shadow-sm" : "bg-gray-100 text-gray-500"}`}
-              >
-                Specific Players
-              </button>
-            </div>
-
-            {!assignToTeam && (
-              <div className="space-y-4 max-w-md mx-auto">
-                {players.map((p) => (
-                  <div
-                    key={p.id}
-                    onClick={() => togglePlayer(p.id)}
-                    className={`p-4 rounded-xl shadow cursor-pointer ${selectedPlayers.includes(p.id) ? "bg-blue-100 border-2 border-blue-500" : "bg-white"}`}
-                  >
-                    {p.firstName} {p.lastName[0]}
-                  </div>
-                ))}
-                {errors.players && <p className="text-red-500 text-sm mt-2">{errors.players}</p>}
-              </div>
-            )}
-          </div>
-
-          <button
+        <button
             onClick={handleSubmit}
             className="w-full bg-blue-600 text-white rounded-xl py-3 mt-6"
           >
             Send Drill
           </button>
         </div>
+        {/* Spacer to ensure visibility above fixed nav */}
         <div className="h-24" />
       </div>
 
+      {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0">
         <BottomNav />
       </div>
