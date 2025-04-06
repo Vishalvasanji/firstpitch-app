@@ -22,9 +22,7 @@ function App() {
         <Route
           path="/create-team"
           element={
-            
               <CreateTeam />
-          
           }
         />
         <Route
@@ -51,7 +49,9 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/drills" element={
+        <Route 
+          path="/drills" 
+          element={
             <PrivateRoute>
               <Drills />
             </PrivateRoute>
