@@ -1,43 +1,49 @@
 import { useEffect, useState } from "react";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 
 export default function CoachDashboard() {
-  const [drills, setDrills] = useState([]);
-  const [quizzes, setQuizzes] = useState([]);
   const [activity, setActivity] = useState([]);
+  const [drillStatus, setDrillStatus] = useState({ completed: 0, total: 0 });
+  const navigate = useNavigate();
 
-  // Pull coach + team info from sessionStorage
+  const teamId = sessionStorage.getItem("currentTeamId");
   const teamName = sessionStorage.getItem("currentTeamName") || "Team Name";
   const coachName = sessionStorage.getItem("coachName") || "coach";
 
   useEffect(() => {
-    // Example placeholders — replace with Firestore queries
-    setDrills([
-      { id: 1, title: "Base Running", completed: 2, total: 5 },
-      { id: 2, title: "Throwing Accuracy", completed: 4, total: 5 },
-    ]);
+    if (!teamId) return;
 
-    setQuizzes([
-      { id: 1, title: "Rules of the Game", completed: 3, total: 5 },
-    ]);
+    const q = query(
+      collection(db, "assignments"),
+      where("type", "==", "drill"),
+      where("teamId", "==", teamId)
+    );
 
-    setActivity([
-      { id: 1, player: "Aiden R", action: "Completed drill: Base Running" },
-      { id: 2, player: "Leo B", action: "Completed quiz: Rules of the Game" },
-      { id: 3, player: "Leo B", action: "Completed quiz: Rules of the Game" },
-      { id: 4, player: "Leo B", action: "Completed quiz: Rules of the Game" },
-      { id: 5, player: "Leo B", action: "Completed quiz: Rules of the Game" },
-      { id: 6, player: "Leo B", action: "Completed quiz: Rules of the Game" },
-    ]);
-  }, []);
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const assignments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  const totalDrills = drills.reduce((sum, d) => sum + d.total, 0);
-  const completedDrills = drills.reduce((sum, d) => sum + d.completed, 0);
-  const drillPercent = totalDrills > 0 ? (completedDrills / totalDrills) * 100 : 0;
+      let allStatuses = [];
+      for (let assignment of assignments) {
+        const statusSnap = await onSnapshot(
+          collection(db, "assignments", assignment.id, "assignmentStatuses"),
+          (subSnap) => {
+            const statuses = subSnap.docs.map(d => d.data());
+            allStatuses.push(...statuses);
+            const completed = allStatuses.filter(s => s.status === "completed").length;
+            const total = allStatuses.length;
+            setDrillStatus({ completed, total });
+          }
+        );
+      }
+    });
 
-  const totalQuizzes = quizzes.reduce((sum, q) => sum + q.total, 0);
-  const completedQuizzes = quizzes.reduce((sum, q) => sum + q.completed, 0);
-  const quizPercent = totalQuizzes > 0 ? (completedQuizzes / totalQuizzes) * 100 : 0;
+    return () => unsubscribe();
+  }, [teamId]);
+
+  const percentComplete = drillStatus.total > 0 ? (drillStatus.completed / drillStatus.total) * 100 : 0;
 
   return (
     <div className="h-screen flex flex-col">
@@ -50,21 +56,29 @@ export default function CoachDashboard() {
 
         {/* Drill Summary */}
         <div className="mt-6 space-y-6">
-          <div className="bg-white shadow rounded-xl p-4 space-y-2">
+          <div
+            className="bg-white shadow rounded-xl p-4 space-y-2 cursor-pointer hover:shadow-lg"
+            onClick={() => navigate("/drills")}
+          >
             <p className="text-lg font-semibold text-gray-800">Drill Progress</p>
             <div className="w-full bg-gray-200 h-2 rounded-full">
-              <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${drillPercent}%` }}></div>
+              <div
+                className="bg-blue-600 h-2 rounded-full"
+                style={{ width: `${percentComplete}%` }}
+              />
             </div>
-            <p className="text-sm text-gray-600">{completedDrills} of {totalDrills} completed</p>
+            <p className="text-sm text-gray-600">
+              {drillStatus.completed} of {drillStatus.total} completed
+            </p>
           </div>
 
-          {/* Quiz Summary */}
+          {/* Quiz Summary Placeholder */}
           <div className="bg-white shadow rounded-xl p-4 space-y-2">
             <p className="text-lg font-semibold text-gray-800">Quiz Progress</p>
             <div className="w-full bg-gray-200 h-2 rounded-full">
-              <div className="bg-green-600 h-2 rounded-full" style={{ width: `${quizPercent}%` }}></div>
+              <div className="bg-green-600 h-2 rounded-full" style={{ width: `0%` }}></div>
             </div>
-            <p className="text-sm text-gray-600">{completedQuizzes} of {totalQuizzes} completed</p>
+            <p className="text-sm text-gray-600">0 of 0 completed</p>
           </div>
         </div>
 
@@ -83,11 +97,10 @@ export default function CoachDashboard() {
           </div>
         </div>
 
-        {/* Bottom Spacer to prevent clipping */}
+        {/* Bottom Spacer */}
         <div className="h-24" />
       </div>
 
-      {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0">
         <BottomNav />
       </div>
