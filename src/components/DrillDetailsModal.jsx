@@ -60,7 +60,7 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
   return (
     <div className="fixed inset-0 bg-white z-50 px-4 pt-6 pb-28 overflow-y-auto">
       <div className="flex justify-center items-center relative mb-4">
-        <h2 className="text-xl font-bold text-blue-800 text-center w-full">{drill.title}</h2>
+        <h2 className="text-xl font-bold text-blue-800 text-left w-full">{drill.title}</h2>
         <button onClick={onClose} className="text-blue-600 font-medium">Close</button>
       </div>
 
@@ -69,7 +69,7 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
           href={drill.videoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative block w-full max-w-md mx-auto aspect-video"
+          className="relative block w-full max-w-md mx-auto aspect-video mb-4"
         >
           <img
             src={thumbnailUrl}
@@ -103,7 +103,7 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
       </div>
 
       <p className="text-xl font-semibold text-red-600 mb-1">Not Completed ({incomplete.length})</p>
-      <div className="space-y-2">
+      <div className="space-y-2 mb-4">
         {incomplete.map(player => (
           <div key={player.id} className="flex items-center bg-white shadow rounded-xl p-3">
   <div className="w-10 h-10 bg-blue-100 text-blue-800 font-bold rounded-full flex items-center justify-center mr-3">
