@@ -72,9 +72,9 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
 
       <p className="text-xl font-semibold text-gray-600 mb-4 text-left">Due: {formatDate(drill.dueDate)}</p>
 
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center gap-2 mb-1">
   <p className="text-xl font-semibold text-green-600">Completed</p>
-  <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-1 rounded-full">
+  <span className="text-xl font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">
     {completed.length}
   </span>
 </div>
@@ -89,9 +89,9 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
         ))}
       </div>
 
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center gap-2 mb-1">
   <p className="text-xl font-semibold text-red-600">Not Completed</p>
-  <span className="text-xs font-medium bg-red-100 text-red-800 px-2 py-1 rounded-full">
+  <span className="text-xl font-semibold bg-red-100 text-red-800 px-2 py-1 rounded-full">
     {incomplete.length}
   </span>
 </div>
