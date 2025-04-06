@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import DrillDetailsModal from "../components/DrillDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import {
@@ -16,6 +17,7 @@ export default function CoachDrillsPage() {
   const navigate = useNavigate();
   const { user, teamId } = useUser();
   const [drills, setDrills] = useState([]);
+  const [selectedDrill, setSelectedDrill] = useState(null);
 
   useEffect(() => {
     async function fetchDrills() {
@@ -84,7 +86,7 @@ export default function CoachDrillsPage() {
             return (
               <div
                 key={drill.id}
-                className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer"
+                className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer" onClick={() => setSelectedDrill(drill)}
               >
                 <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
                 <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
@@ -105,6 +107,15 @@ export default function CoachDrillsPage() {
         </div>
         <div className="h-24" />
       </div>
+
+      {selectedDrill && (
+        <DrillDetailsModal
+          drill={selectedDrill}
+          assignmentId={selectedDrill.assignmentId}
+          teamId={teamId}
+          onClose={() => setSelectedDrill(null)}
+        />
+      )}
 
       <div className="fixed bottom-0 left-0 right-0">
         <BottomNav />
