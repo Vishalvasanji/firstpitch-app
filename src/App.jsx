@@ -8,7 +8,7 @@ import PlayerRegister from "./pages/PlayerRegister";
 import VerifyCode from "./pages/VerifyCode";
 import CreateAssignment from "./pages/CreateAssignment";
 import CreateDrill from "./pages/CreateDrill";
-import CoachDrillsPage from "./pages/Drills";
+import Drills from "./pages/Drills";
 
 function App() {
   return (
