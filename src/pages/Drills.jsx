@@ -73,7 +73,7 @@ export default function CoachDrillsPage() {
           +
           </button>
         </div>
-      <div>
+   
 
         <div className="space-y-4">
           {drills.map((drill) => {
