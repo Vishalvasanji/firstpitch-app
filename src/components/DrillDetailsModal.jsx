@@ -41,8 +41,17 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
 
   const extractYouTubeId = (url) => {
-    const match = url.match(/(?:v=|youtu\.be\/)([^&]+)/);
-    return match ? match[1] : null;
+    try {
+      const parsedUrl = new URL(url);
+      if (parsedUrl.hostname === 'youtu.be') {
+        return parsedUrl.pathname.split('/')[1];
+      } else if (parsedUrl.hostname.includes('youtube.com')) {
+        return parsedUrl.searchParams.get('v');
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   };
 
   const videoId = extractYouTubeId(drill.videoUrl);
