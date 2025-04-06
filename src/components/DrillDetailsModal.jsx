@@ -74,7 +74,7 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
 
       <div className="flex items-center gap-2 mb-1">
   <p className="text-xl font-semibold text-green-600">Completed</p>
-  <span className="text-xl font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">
+  <span className="text-lg font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">
     {completed.length}
   </span>
 </div>
@@ -91,7 +91,7 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
 
       <div className="flex items-center gap-2 mb-1">
   <p className="text-xl font-semibold text-red-600">Not Completed</p>
-  <span className="text-xl font-semibold bg-red-100 text-red-800 px-2 py-1 rounded-full">
+  <span className="text-md font-semibold bg-red-100 text-red-800 px-2 py-1 rounded-full">
     {incomplete.length}
   </span>
 </div>
