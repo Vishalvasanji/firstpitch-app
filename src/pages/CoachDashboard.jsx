@@ -60,9 +60,9 @@ export default function CoachDashboard() {
             className="bg-white shadow rounded-xl p-4 space-y-2 cursor-pointer hover:shadow-lg"
             onClick={() => navigate("/drills")}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
   <p className="text-lg font-semibold text-gray-800">Drill Progress</p>
-  <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+  <span className="text-md font-semibold bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
     {drillStatus.total > 0 ? drillStatus.total : 0}
   </span>
 </div>
