@@ -106,7 +106,7 @@ export default function CreateDrill() {
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
         <div className="pt-6 px-4 mb-6">
           <h1 className="text-lg font-bold text-blue-800 text-center">Create Drill</h1>
-        </div>
+    
         <div className="space-y-4">
           <input
             type="text"
