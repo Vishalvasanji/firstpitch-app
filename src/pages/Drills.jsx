@@ -63,16 +63,17 @@ export default function CoachDrillsPage() {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-lg font-bold text-blue-800 text-center">Drills</h1> 
+        <div className="relative mb-4">
+          <h1 className="text-lg font-bold text-blue-800 text-center">Drills</h1>
           <button
             onClick={() => navigate("/create-drill")}
-            className="w-10 h-10 rounded-full bg-blue-600 text-white shadow-md flex items-center justify-center text-xl hover:bg-blue-700"
+            className="absolute right-0 top-0 w-10 h-10 rounded-full bg-blue-600 text-white shadow-md flex items-center justify-center text-xl hover:bg-blue-700"
             aria-label="Add Drill"
           >
-            +
+          +
           </button>
         </div>
+      <div>
 
         <div className="space-y-4">
           {drills.map((drill) => {
