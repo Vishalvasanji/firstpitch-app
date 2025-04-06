@@ -8,6 +8,7 @@ import PlayerRegister from "./pages/PlayerRegister";
 import VerifyCode from "./pages/VerifyCode";
 import CreateAssignment from "./pages/CreateAssignment";
 import CreateDrill from "./pages/CreateDrill";
+import CoachDrillsPage from "./pages/Drills";
 
 function App() {
   return (
@@ -47,6 +48,12 @@ function App() {
           element={
             <PrivateRoute>
               <CreateDrill />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/drills" element={
+            <PrivateRoute>
+              <Drills />
             </PrivateRoute>
           }
         />
