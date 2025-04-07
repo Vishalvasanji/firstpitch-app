@@ -18,7 +18,6 @@ export default function CoachDrillsPage() {
   const { user, teamId } = useUser();
   const [drills, setDrills] = useState([]);
   const [selectedDrill, setSelectedDrill] = useState(null);
-  const [showOpen, setShowOpen] = useState(true);
   const [showClosed, setShowClosed] = useState(false);
 
   useEffect(() => {
@@ -37,10 +36,14 @@ export default function CoachDrillsPage() {
         const drillSnap = await getDoc(drillRef);
 
         let drill = drillSnap.exists()
-          ? { id: drillSnap.id, ...drillSnap.data(), assignmentId: assignment.id, dueDate: assignment.dueDate }
+          ? {
+              id: drillSnap.id,
+              ...drillSnap.data(),
+              assignmentId: assignment.id,
+              dueDate: assignment.dueDate,
+            }
           : null;
 
-        // Fetch assignment statuses
         const statusSnap = await getDocs(
           collection(db, "assignments", assignment.id, "assignmentStatuses")
         );
@@ -77,88 +80,81 @@ export default function CoachDrillsPage() {
             className="absolute right-0 top-0 w-10 h-10 rounded-full bg-blue-600 text-white shadow-md flex items-center justify-center text-xl hover:bg-blue-700"
             aria-label="Add Drill"
           >
-          +
+            +
           </button>
         </div>
 
-        <div className="space-y-6">
-          <div>
-            <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowOpen(!showOpen)}>
-              <p className="text-xl font-semibold text-green-600">Open</p>
-              <span className="text-xl text-green-600">{showOpen ? '▲' : '▼'}</span>
-            </div>
-            {showOpen && (
-              <div className="space-y-4">
-                {openDrills.map((drill) => {
-                  const completionPercent = drill.total
-                    ? Math.round((drill.completed / drill.total) * 100)
-                    : 0;
+        <div className="space-y-4">
+          {openDrills.map((drill) => {
+            const completionPercent = drill.total
+              ? Math.round((drill.completed / drill.total) * 100)
+              : 0;
 
-                  return (
-                    <div
-                      key={drill.id}
-                      className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer"
-                      onClick={() => setSelectedDrill(drill)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
-                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700">Open</span>
-                      </div>
-                      <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
-                      <div className="w-full bg-gray-200 h-2 rounded-full">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
-                          style={{ width: `${completionPercent}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {drill.completed} of {drill.total} completed
-                      </p>
-                    </div>
-                  );
-                })}
+            return (
+              <div
+                key={drill.id}
+                className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer"
+                onClick={() => setSelectedDrill(drill)}
+              >
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
+                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700">Open</span>
+                </div>
+                <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                <div className="w-full bg-gray-200 h-2 rounded-full">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all"
+                    style={{ width: `${completionPercent}%` }}
+                  />
+                </div>
+                <p className="text-sm text-gray-600">
+                  {drill.completed} of {drill.total} completed
+                </p>
               </div>
-            )}
+            );
+          })}
+        </div>
+
+        <div className="mt-6">
+          <div
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setShowClosed(!showClosed)}
+          >
+            <p className="text-xl font-semibold text-gray-600">Closed</p>
+            <span className="text-xl text-gray-600">{showClosed ? "▲" : "▼"}</span>
           </div>
+          {showClosed && (
+            <div className="space-y-4 mt-4">
+              {closedDrills.map((drill) => {
+                const completionPercent = drill.total
+                  ? Math.round((drill.completed / drill.total) * 100)
+                  : 0;
 
-          <div>
-            <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowClosed(!showClosed)}>
-              <p className="text-xl font-semibold text-gray-600">Closed</p>
-              <span className="text-xl text-gray-600">{showClosed ? '▲' : '▼'}</span>
-            </div>
-            {showClosed && (
-              <div className="space-y-4">
-                {closedDrills.map((drill) => {
-                  const completionPercent = drill.total
-                    ? Math.round((drill.completed / drill.total) * 100)
-                    : 0;
-
-                  return (
-                    <div
-                      key={drill.id}
-                      className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer"
-                      onClick={() => setSelectedDrill(drill)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
-                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-700">Closed</span>
-                      </div>
-                      <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
-                      <div className="w-full bg-gray-200 h-2 rounded-full">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
-                          style={{ width: `${completionPercent}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {drill.completed} of {drill.total} completed
-                      </p>
+                return (
+                  <div
+                    key={drill.id}
+                    className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer"
+                    onClick={() => setSelectedDrill(drill)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
+                      <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-700">Closed</span>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                    <div className="w-full bg-gray-200 h-2 rounded-full">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        style={{ width: `${completionPercent}%` }}
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {drill.completed} of {drill.total} completed
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="h-24" />
