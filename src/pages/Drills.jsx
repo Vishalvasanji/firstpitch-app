@@ -100,7 +100,7 @@ export default function CoachDrillsPage() {
                   <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
                   <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700">Open</span>
                 </div>
-                <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                <p className="text-sm font-semibold text-gray-600">Due: {formatDate(drill.dueDate)}</p>
                 <div className="w-full bg-gray-200 h-2 rounded-full">
                   <div
                     className="bg-blue-600 h-2 rounded-full transition-all"
@@ -140,7 +140,7 @@ export default function CoachDrillsPage() {
                       <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
                       <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-700">Closed</span>
                     </div>
-                    <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                    <p className="text-sm font-semibold text-gray-600">Due: {formatDate(drill.dueDate)}</p>
                     <div className="w-full bg-gray-200 h-2 rounded-full">
                       <div
                         className="bg-blue-600 h-2 rounded-full transition-all"
