@@ -15,19 +15,24 @@ export default function GenerateQuizModal({ handleClose, handleGenerate }) {
         </button>
       </div>
 
+      {/* Explainer Text */}
+      <p className="text-sm text-gray-600 mb-4">
+        Tell us what the quiz should cover. We'll generate age-appropriate questions your team can answer in-app. You’ll be able to review and edit the questions and answers before sending.
+      </p>
+
       {/* Form Fields */}
       <input
         type="text"
         placeholder="Enter quiz topic"
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4"
+        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 h-12"
       />
 
       <select
         value={questionCount}
         onChange={(e) => setQuestionCount(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4"
+        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 h-12"
       >
         <option value="">Select number of questions</option>
         <option value="3">3</option>
