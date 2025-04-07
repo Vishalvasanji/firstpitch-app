@@ -2,10 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import BottomNav from "../components/BottomNav";
 import GenerateQuizModal from "../components/GenerateQuizModal";
+import CreateDrillModal from "../components/CreateDrillModal";
 
 export default function CreateAssignment() {
   const navigate = useNavigate();
   const [showQuizModal, setShowQuizModal] = useState(false);
+  const [showDrillModal, setShowDrillModal] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 pb-24">
@@ -17,7 +19,7 @@ export default function CreateAssignment() {
       {/* Cards aligned to top with spacing */}
       <div className="px-4 mt-6 flex flex-col space-y-6">
         <div
-          onClick={() => navigate("/create-drill")}
+          onClick={() => setShowDrillModal(true)}
           className="w-full max-w-md h-32 bg-white shadow-md rounded-2xl flex flex-col justify-center items-center cursor-pointer hover:shadow-lg transition mx-auto"
         >
           <h2 className="text-xl font-semibold text-gray-800">Create Drill</h2>
@@ -46,6 +48,13 @@ export default function CreateAssignment() {
             console.log("Generate quiz with:", data);
             setShowQuizModal(false);
           }}
+        />
+      )}
+
+      {/* Create Drill Modal */}
+      {showDrillModal && (
+        <CreateDrillModal
+          handleClose={() => setShowDrillModal(false)}
         />
       )}
     </div>
