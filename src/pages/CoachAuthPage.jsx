@@ -76,10 +76,8 @@ import { useState } from "react";
    };
  
    return (
-     <div className="h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
-       <form
-         onSubmit={handleSubmit}
-         className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl space-y-4"
+     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
+       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4 px-4 pt-8"
        >
          <h2 className="text-2xl font-bold text-center text-blue-700">
            {isRegistering ? "Coach Sign Up" : "Coach Login"}
