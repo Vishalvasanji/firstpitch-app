@@ -16,7 +16,7 @@ export default function GenerateQuizModal({ handleClose, handleGenerate }) {
       </div>
 
       {/* Explainer Text */}
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="text-md text-gray-600 mb-4">
         Tell us what the quiz should cover. We'll generate age-appropriate questions your team can answer in-app. You’ll be able to review and edit the questions and answers before sending.
       </p>
 
