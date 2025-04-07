@@ -80,7 +80,6 @@ export default function CoachDrillsPage() {
           +
           </button>
         </div>
-   
 
         <div className="space-y-6">
           <div>
@@ -160,19 +159,23 @@ export default function CoachDrillsPage() {
               </div>
             )}
           </div>
+        </div>
+
         <div className="h-24" />
 
-      {selectedDrill && (
-        <DrillDetailsModal
-          drill={selectedDrill}
-          assignmentId={selectedDrill.assignmentId}
-          teamId={teamId}
-          onClose={() => setSelectedDrill(null)}
-        />
-      )}
+        {selectedDrill && (
+          <DrillDetailsModal
+            drill={selectedDrill}
+            assignmentId={selectedDrill.assignmentId}
+            teamId={teamId}
+            onClose={() => setSelectedDrill(null)}
+          />
+        )}
 
-      <div className="fixed bottom-0 left-0 right-0">
-        <BottomNav />
+        <div className="fixed bottom-0 left-0 right-0">
+          <BottomNav />
+        </div>
       </div>
+    </div>
   );
 }
