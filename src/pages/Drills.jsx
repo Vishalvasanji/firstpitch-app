@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import DrillDetailsModal from "../components/DrillDetailsModal";
+import CreateDrillModal from "../components/CreateDrillModal";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import {
@@ -19,6 +20,7 @@ export default function CoachDrillsPage() {
   const [drills, setDrills] = useState([]);
   const [selectedDrill, setSelectedDrill] = useState(null);
   const [showClosed, setShowClosed] = useState(false);
+  const [showDrillModal, setShowDrillModal] = useState(false);
 
   useEffect(() => {
     async function fetchDrills() {
@@ -76,7 +78,7 @@ export default function CoachDrillsPage() {
         <div className="relative mb-4">
           <h1 className="text-lg font-bold text-blue-800 text-center">Drills</h1>
           <button
-            onClick={() => navigate("/create-drill")}
+            onClick={() => setShowDrillModal(true)}
             className="absolute right-0 top-0 w-10 h-10 rounded-full bg-blue-600 text-white shadow-md flex items-center justify-center text-xl hover:bg-blue-700"
             aria-label="Add Drill"
           >
@@ -100,7 +102,7 @@ export default function CoachDrillsPage() {
                   <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
                   <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700">Open</span>
                 </div>
-                <p className="text-sm font-semibold text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
                 <div className="w-full bg-gray-200 h-2 rounded-full">
                   <div
                     className="bg-blue-600 h-2 rounded-full transition-all"
@@ -140,7 +142,7 @@ export default function CoachDrillsPage() {
                       <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
                       <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-700">Closed</span>
                     </div>
-                    <p className="text-sm font-semibold text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                    <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
                     <div className="w-full bg-gray-200 h-2 rounded-full">
                       <div
                         className="bg-blue-600 h-2 rounded-full transition-all"
@@ -165,6 +167,12 @@ export default function CoachDrillsPage() {
             assignmentId={selectedDrill.assignmentId}
             teamId={teamId}
             onClose={() => setSelectedDrill(null)}
+          />
+        )}
+
+        {showDrillModal && (
+          <CreateDrillModal
+            handleClose={() => setShowDrillModal(false)}
           />
         )}
 
