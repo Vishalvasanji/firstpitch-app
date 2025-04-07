@@ -55,10 +55,17 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
   const videoId = extractYouTubeId(drill.videoUrl);
   const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : null;
 
+  const isClosed = new Date(drill.dueDate) < new Date();
+
   return (
     <div className="fixed inset-0 bg-white z-50 px-4 pt-6 pb-28 overflow-y-auto">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-blue-800">{drill.title}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-blue-800 text-left">{drill.title}</h2>
+          <span className={`text-xs font-medium px-2 py-1 rounded-full ${isClosed ? 'bg-gray-200 text-gray-700' : 'bg-green-100 text-green-700'}`}>
+            {isClosed ? 'Closed' : 'Open'}
+          </span>
+        </div>
         <button onClick={onClose} className="text-blue-600 font-medium">Close</button>
       </div>
 
@@ -74,7 +81,7 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
 
       <div className="flex items-center gap-2 mb-1">
   <p className="text-xl font-semibold text-green-600">Completed</p>
-  <span className="text-md font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">
+  <span className="text-xl font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">
     {completed.length}
   </span>
 </div>
@@ -91,7 +98,7 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
 
       <div className="flex items-center gap-2 mb-1">
   <p className="text-xl font-semibold text-red-600">Not Completed</p>
-  <span className="text-md font-semibold bg-red-100 text-red-800 px-2 py-1 rounded-full">
+  <span className="text-xl font-semibold bg-red-100 text-red-800 px-2 py-1 rounded-full">
     {incomplete.length}
   </span>
 </div>
