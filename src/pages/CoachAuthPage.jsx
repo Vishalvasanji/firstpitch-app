@@ -1,145 +1,74 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
 import { auth, db } from "../firebase";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function CoachAuthPage() {
-  const navigate = useNavigate();
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleAuth = async () => {
     try {
+      let userCredential;
       if (isRegistering) {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-
-        const uid = userCredential.user.uid;
-
-        await setDoc(doc(db, "users", uid), {
-          firstName,
-          lastName, // ✅ Save but not displayed
-          email,
-          createdAt: new Date(),
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          role: "coach",
+          email: email,
         });
-
-        sessionStorage.setItem("coachName", firstName);
-        alert("Account created successfully!");
-        navigate("/create-team");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-
-        const uid = auth.currentUser.uid;
-        const userRef = doc(db, "users", uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-
-          sessionStorage.setItem("coachName", userData.firstName);
-          sessionStorage.setItem("currentTeamId", userData.teamId || "");
-
-          if (userData.teamId) {
-            const teamRef = doc(db, "teams", userData.teamId);
-            const teamSnap = await getDoc(teamRef);
-
-            if (teamSnap.exists()) {
-              sessionStorage.setItem(
-                "currentTeamName",
-                teamSnap.data().teamName
-              );
-            }
-          }
-
-          alert(`Welcome back, Coach ${userData.firstName}`);
-          navigate("/dashboard");
-        } else {
-          alert("Coach profile not found.");
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+        if (!userDoc.exists() || userDoc.data().role !== "coach") {
+          alert("Access denied. Not a coach account.");
+          return;
         }
       }
+      navigate("/create-team");
     } catch (err) {
-      console.error("Authentication error:", err);
-      alert("There was a problem. Please try again.");
+      alert("Authentication failed: " + err.message);
     }
   };
 
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl space-y-4"
-      >
-        <h2 className="text-2xl font-bold text-center text-blue-700">
-          {isRegistering ? "Coach Sign Up" : "Coach Login"}
-        </h2>
-
-        {isRegistering && (
-          <>
-            <input
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full p-3 border rounded-xl"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full p-3 border rounded-xl"
-              required
-            />
-          </>
-        )}
-
+      <div className="bg-white shadow rounded-xl w-full max-w-md p-6">
+        <h1 className="text-center text-xl font-bold text-blue-800 mb-4">
+          {isRegistering ? "Coach Registration" : "Coach Login"}
+        </h1>
         <input
           type="email"
-          placeholder="Email Address"
+          placeholder="Email"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-3 border rounded-xl"
-          required
         />
-
         <input
           type="password"
           placeholder="Password"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-3 border rounded-xl"
-          required
         />
-
         <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+          onClick={handleAuth}
+          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mb-3"
         >
-          {isRegistering ? "Create Account" : "Login"}
+          {isRegistering ? "Register" : "Login"}
         </button>
-
-        <p
-          className="text-sm text-center text-blue-600 underline cursor-pointer"
-          onClick={() => setIsRegistering(!isRegistering)}
-        >
-          {isRegistering
-            ? "Already have an account? Login"
-            : "New coach? Create an account"}
+        <p className="text-center text-sm text-gray-600">
+          {isRegistering ? "Already have an account?" : "New coach?"} {" "}
+          <button
+            className="text-blue-600 hover:underline"
+            onClick={() => setIsRegistering(!isRegistering)}
+          >
+            {isRegistering ? "Login" : "Register"}
+          </button>
         </p>
-      </form>
+      </div>
     </div>
   );
 }
