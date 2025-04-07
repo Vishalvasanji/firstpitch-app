@@ -161,7 +161,6 @@ export default function CoachDrillsPage() {
             )}
           </div>
         <div className="h-24" />
-      </div>
 
       {selectedDrill && (
         <DrillDetailsModal
