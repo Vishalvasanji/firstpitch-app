@@ -161,18 +161,7 @@ export default function CoachDrillsPage() {
             )}
           </div>
         </div>
-                <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
-
-                <div className="w-full bg-gray-200 h-2 rounded-full">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all"
-                    style={{ width: `${completionPercent}%` }}
-                  />
-                </div>
-
-                <p className="text-sm text-gray-600">
-                  {drill.completed} of {drill.total} completed
-                </p>
+               
               </div>
             );
           })}
