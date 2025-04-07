@@ -76,7 +76,7 @@ export default function CoachAuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl space-y-4"
