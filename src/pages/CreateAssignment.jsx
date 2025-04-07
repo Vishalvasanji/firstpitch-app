@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import BottomNav from "../components/BottomNav";
+import GenerateQuizModal from "../components/GenerateQuizModal";
 
 export default function CreateAssignment() {
   const navigate = useNavigate();
+  const [showQuizModal, setShowQuizModal] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 pb-24">
@@ -22,7 +25,7 @@ export default function CreateAssignment() {
         </div>
 
         <div
-          onClick={() => navigate("/create-quiz")}
+          onClick={() => setShowQuizModal(true)}
           className="w-full max-w-md h-32 bg-white shadow-md rounded-2xl flex flex-col justify-center items-center cursor-pointer hover:shadow-lg transition mx-auto"
         >
           <h2 className="text-xl font-semibold text-gray-800">Create Quiz</h2>
@@ -34,6 +37,17 @@ export default function CreateAssignment() {
       <div className="fixed bottom-0 left-0 right-0">
         <BottomNav />
       </div>
+
+      {/* Generate Quiz Modal */}
+      {showQuizModal && (
+        <GenerateQuizModal
+          handleClose={() => setShowQuizModal(false)}
+          handleGenerate={(data) => {
+            console.log("Generate quiz with:", data);
+            setShowQuizModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
