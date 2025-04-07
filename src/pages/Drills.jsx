@@ -18,6 +18,8 @@ export default function CoachDrillsPage() {
   const { user, teamId } = useUser();
   const [drills, setDrills] = useState([]);
   const [selectedDrill, setSelectedDrill] = useState(null);
+  const [showOpen, setShowOpen] = useState(true);
+  const [showClosed, setShowClosed] = useState(false);
 
   useEffect(() => {
     async function fetchDrills() {
@@ -62,6 +64,9 @@ export default function CoachDrillsPage() {
     return new Date(dateStr).toLocaleDateString();
   };
 
+  const openDrills = drills.filter((drill) => new Date(drill.dueDate) >= new Date());
+  const closedDrills = drills.filter((drill) => new Date(drill.dueDate) < new Date());
+
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
@@ -77,18 +82,85 @@ export default function CoachDrillsPage() {
         </div>
    
 
-        <div className="space-y-4">
-          {drills.map((drill) => {
-            const completionPercent = drill.total
-              ? Math.round((drill.completed / drill.total) * 100)
-              : 0;
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowOpen(!showOpen)}>
+              <p className="text-xl font-semibold text-green-600">Open</p>
+              <span className="text-xl text-green-600">{showOpen ? '▲' : '▼'}</span>
+            </div>
+            {showOpen && (
+              <div className="space-y-4">
+                {openDrills.map((drill) => {
+                  const completionPercent = drill.total
+                    ? Math.round((drill.completed / drill.total) * 100)
+                    : 0;
 
-            return (
-              <div
-                key={drill.id}
-                className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer" onClick={() => setSelectedDrill(drill)}
-              >
-                <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
+                  return (
+                    <div
+                      key={drill.id}
+                      className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer"
+                      onClick={() => setSelectedDrill(drill)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700">Open</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                      <div className="w-full bg-gray-200 h-2 rounded-full">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          style={{ width: `${completionPercent}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {drill.completed} of {drill.total} completed
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowClosed(!showClosed)}>
+              <p className="text-xl font-semibold text-gray-600">Closed</p>
+              <span className="text-xl text-gray-600">{showClosed ? '▲' : '▼'}</span>
+            </div>
+            {showClosed && (
+              <div className="space-y-4">
+                {closedDrills.map((drill) => {
+                  const completionPercent = drill.total
+                    ? Math.round((drill.completed / drill.total) * 100)
+                    : 0;
+
+                  return (
+                    <div
+                      key={drill.id}
+                      className="bg-white rounded-xl shadow-md p-4 space-y-2 cursor-pointer"
+                      onClick={() => setSelectedDrill(drill)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-800">{drill.title}</h2>
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-700">Closed</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
+                      <div className="w-full bg-gray-200 h-2 rounded-full">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          style={{ width: `${completionPercent}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {drill.completed} of {drill.total} completed
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
                 <p className="text-sm text-gray-600">Due: {formatDate(drill.dueDate)}</p>
 
                 <div className="w-full bg-gray-200 h-2 rounded-full">
