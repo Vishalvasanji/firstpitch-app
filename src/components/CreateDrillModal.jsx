@@ -145,14 +145,14 @@ export default function CreateDrillModal({ handleClose }) {
         />
         {errors.instructions && <p className="text-red-500 text-sm mb-2">{errors.instructions}</p>}
 
-        <div className="flex items-center gap-2 mb-2">
-          <label className="text-gray-700 font-medium">Due Date</label>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 mb-2">
+          <label className="text-gray-700 font-medium mb-1 sm:mb-0">Due Date</label>
           <input
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             placeholder="Select Date"
-            className={`border rounded-xl p-3 flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
+            className={`border rounded-xl p-3 sm:flex-grow ${errors.dueDate ? "border-red-500" : ""}`}
           />
         </div>
         {errors.dueDate && <p className="text-red-500 text-sm mb-2">{errors.dueDate}</p>}
