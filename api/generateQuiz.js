@@ -3,11 +3,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { topic, questionCount, scenario, ageGroup } = req.body;
+  const { topic, scenario, ageGroup } = req.body;
 
   const prompt = `
 You are a youth baseball coach creating a quiz for ${ageGroup} players.
-Generate ${questionCount} multiple choice questions that teach the following topic:
+Generate 3 multiple choice questions that teach the following topic:
 Topic: ${topic}
 ${scenario ? `Scenario: ${scenario}` : ""}
 If the topic is a rule, then one of the questions generated should test knowledge of the rule.
