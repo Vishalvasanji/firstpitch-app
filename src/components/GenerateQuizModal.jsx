@@ -1,8 +1,7 @@
 import { useState } from "react";
 
-export default function GenerateQuizModal({ handleClose, handleGenerate }) {
+export default function GenerateQuizModal({ handleClose, handleGenerate, ageGroup }) {
   const [topic, setTopic] = useState("");
-  const [questionCount, setQuestionCount] = useState("");
   const [scenario, setScenario] = useState("");
 
   return (
@@ -16,7 +15,7 @@ export default function GenerateQuizModal({ handleClose, handleGenerate }) {
       </div>
 
       {/* Explainer Text */}
-      <p className="text-md text-gray-600 mb-4">
+      <p className="text-sm text-gray-600 mb-4">
         Tell us what the quiz should cover. We'll generate age-appropriate questions your team can answer in-app. You’ll be able to review and edit the questions and answers before sending.
       </p>
 
@@ -29,18 +28,6 @@ export default function GenerateQuizModal({ handleClose, handleGenerate }) {
         className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 h-12"
       />
 
-      <select
-        value={questionCount}
-        onChange={(e) => setQuestionCount(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 h-12"
-      >
-        <option value="">Select number of questions</option>
-        <option value="3">3</option>
-        <option value="5">5</option>
-        <option value="7">7</option>
-        <option value="10">10</option>
-      </select>
-
       <textarea
         placeholder="Optional scenario or coaching context..."
         value={scenario}
@@ -49,8 +36,8 @@ export default function GenerateQuizModal({ handleClose, handleGenerate }) {
       />
 
       <button
-        disabled={!topic || !questionCount}
-        onClick={() => handleGenerate({ topic, questionCount, scenario })}
+        disabled={!topic}
+        onClick={() => handleGenerate({ topic, questionCount: 3, scenario, ageGroup })}
         className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg w-full disabled:opacity-50"
       >
         Generate Questions
