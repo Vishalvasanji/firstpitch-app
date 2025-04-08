@@ -11,8 +11,8 @@ Generate ${questionCount} multiple choice questions that teach the following top
 Topic: ${topic}
 ${scenario ? `Scenario: ${scenario}` : ""}
 Make sure the questions are age-appropriate, use simple language, and focus on teaching the key concepts.
-Also generate a short, appropriate title for the quiz.
-Each question must include 3 answer choices and exactly one correct answer.
+Also generate a short, appropriate title for the quiz. Do not include the age group in the title.
+Each question must include 4 answer choices.
 Respond ONLY in the following JSON format. Include a "title" key followed by "questions":
 
 
@@ -21,8 +21,7 @@ Respond ONLY in the following JSON format. Include a "title" key followed by "qu
   "questions": [
     {
       "question": "string",
-      "options": ["A", "B", "C"],
-      "answerIndex": 0
+      "options": ["A", "B", "C", "D"],
     },
     ...
   ]
