@@ -13,7 +13,7 @@ ${scenario ? `Scenario: ${scenario}` : ""}
 Make sure the questions are age-appropriate, use simple language, and focus on teaching the key concepts.
 Also generate a short, appropriate title for the quiz.
 Each question must include 3 answer choices and exactly one correct answer.
-Respond ONLY in the following JSON format. Include a `"title"` key followed by `"questions"`:
+Respond ONLY in the following JSON format. Include a "title" key followed by "questions":
 
 
 {
