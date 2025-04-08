@@ -15,13 +15,12 @@ Also generate a short, appropriate title for the quiz. Do not include the age gr
 Each question must include 4 answer choices.
 Respond ONLY in the following JSON format. Include a "title" key followed by "questions":
 
-
 {
   "title": "string",
   "questions": [
     {
       "question": "string",
-      "options": ["A", "B", "C", "D"],
+      "options": ["A", "B", "C", "D"]
     },
     ...
   ]
