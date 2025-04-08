@@ -7,26 +7,18 @@ export default async function handler(req, res) {
 
   const prompt = `
 You are a youth baseball coach creating a quiz for ${ageGroup} players.
-
 Generate ${questionCount} multiple choice questions that teach the following topic:
 Topic: ${topic}
-
 ${scenario ? `Scenario: ${scenario}` : ""}
-
 Make sure the questions are age-appropriate, use simple language, and focus on teaching the key concepts.
-
-Each question must include 4 answer choices and exactly one correct answer.
-
-Also generate a short, appropriate title for the quiz.
-
+Each question must include 3 answer choices and exactly one correct answer.
 Respond ONLY in the following JSON format:
 
 {
-  "title": "string",
   "questions": [
     {
       "question": "string",
-      "options": ["A", "B", "C", "D"],
+      "options": ["A", "B", "C"],
       "answerIndex": 0
     },
     ...
@@ -42,7 +34,7 @@ Respond ONLY in the following JSON format:
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
       }),
