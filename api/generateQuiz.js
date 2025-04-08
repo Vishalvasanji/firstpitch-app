@@ -10,6 +10,7 @@ You are a youth baseball coach creating a quiz for ${ageGroup} players.
 Generate ${questionCount} multiple choice questions that teach the following topic:
 Topic: ${topic}
 ${scenario ? `Scenario: ${scenario}` : ""}
+If the topic is a rule, then one of the questions generated should test knowledge of the rule.
 Make sure the questions are age-appropriate, use simple language, and focus on teaching the key concepts.
 Also generate a short, appropriate title for the quiz. Do not include the age group in the title.
 Each question must include 4 answer choices.
