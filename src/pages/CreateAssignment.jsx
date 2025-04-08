@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 import GenerateQuizModal from "../components/GenerateQuizModal";
 import CreateDrillModal from "../components/CreateDrillModal";
@@ -8,6 +8,14 @@ export default function CreateAssignment() {
   const navigate = useNavigate();
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [showDrillModal, setShowDrillModal] = useState(false);
+  const [ageGroup, setAgeGroup] = useState("");
+
+  useEffect(() => {
+    const storedAgeGroup = sessionStorage.getItem("currentTeamAgeGroup");
+    if (storedAgeGroup) {
+      setAgeGroup(storedAgeGroup);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 pb-24">
@@ -48,6 +56,7 @@ export default function CreateAssignment() {
             console.log("Generate quiz with:", data);
             setShowQuizModal(false);
           }}
+          ageGroup={ageGroup}
         />
       )}
 
