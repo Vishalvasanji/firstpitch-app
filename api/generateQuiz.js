@@ -1,21 +1,9 @@
-import { OpenAI } from "openai";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   const { topic, questionCount, scenario, ageGroup } = req.body;
-
-  console.log("BODY:", req.body);
-  console.log("API KEY PRESENT:", !!process.env.OPENAI_API_KEY);
-  console.log("RAW RESPONSE:", raw);
-
-  if (!topic || !questionCount || !ageGroup) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
 
   const prompt = `
 You are a youth baseball coach creating a quiz for ${ageGroup} players.
@@ -40,30 +28,41 @@ Respond ONLY in the following JSON format:
       "question": "string",
       "options": ["A", "B", "C", "D"],
       "answerIndex": 0
-    }
+    },
+    ...
   ]
 }
 `;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+      }),
     });
 
-    const raw = response.choices[0].message.content;
-    console.log("RAW RESPONSE:", raw);
+    const raw = await openaiRes.json();
 
-    const data = JSON.parse(raw);
-
-    if (!data.title || !Array.isArray(data.questions)) {
-      throw new Error("Invalid AI response structure");
+    if (!raw.choices || !raw.choices[0]?.message?.content) {
+      return res.status(500).json({ error: "Invalid OpenAI response", raw });
     }
 
-    res.status(200).json(data);
+    const parsed = JSON.parse(raw.choices[0].message.content);
+
+    if (!parsed.title || !Array.isArray(parsed.questions)) {
+      return res.status(500).json({ error: "Malformed quiz format", raw });
+    }
+
+    res.status(200).json(parsed);
   } catch (err) {
-    console.error("AI generation error:", err);
-    res.status(500).json({ error: "Failed to generate quiz", debug: err.message });
+    console.error("Quiz generation error:", err);
+    res.status(500).json({ error: "Failed to generate quiz", message: err.message });
   }
 }
