@@ -19,13 +19,14 @@ function generateJoinCode(length = 6) {
 
 export default function CreateTeam() {
   const [teamName, setTeamName] = useState("");
+  const [ageGroup, setAgeGroup] = useState("");
   const [joinCode, setJoinCode] = useState(null);
   const [createdTeamName, setCreatedTeamName] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleCreateTeam = async (e) => {
     e.preventDefault();
-    if (!teamName.trim()) return;
+    if (!teamName.trim() || !ageGroup.trim()) return;
 
     setLoading(true);
     const code = generateJoinCode();
@@ -34,14 +35,16 @@ export default function CreateTeam() {
     try {
       const teamRef = await addDoc(collection(db, "teams"), {
         teamName,
+        ageGroup,
         coachId,
         joinCode: code,
         createdAt: serverTimestamp(),
       });
 
-      // Save teamId and name to session
+      // Save teamId, name, and ageGroup to session
       sessionStorage.setItem("currentTeamId", teamRef.id);
       sessionStorage.setItem("currentTeamName", teamName);
+      sessionStorage.setItem("currentTeamAgeGroup", ageGroup);
 
       // Update coach's user document with teamId
       await setDoc(
@@ -129,9 +132,25 @@ export default function CreateTeam() {
           placeholder="Team Name"
           value={teamName}
           onChange={(e) => setTeamName(e.target.value)}
-          className="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 h-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
+        <select
+          value={ageGroup}
+          onChange={(e) => setAgeGroup(e.target.value)}
+          className="w-full p-2 h-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option value="">Select Age Group</option>
+          <option value="8U">8U</option>
+          <option value="9U">9U</option>
+          <option value="10U">10U</option>
+          <option value="11U">11U</option>
+          <option value="12U">12U</option>
+          <option value="13U">13U</option>
+          <option value="14U">14U</option>
+          
+        </select>
         <button
           type="submit"
           className="w-full bg-blue-600 text-white p-2 rounded-xl font-medium hover:bg-blue-700 transition"
