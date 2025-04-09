@@ -152,6 +152,10 @@ export default function CreateQuiz() {
           <textarea
             value={q.question}
             onChange={(e) => updateQuestion(i, e.target.value)}
+            onInput={(e) => {
+              e.target.style.height = 'auto'; // reset first
+              e.target.style.height = `${e.target.scrollHeight}px`; // then grow to fit
+            }}
             rows={1}
             className="w-full border rounded-lg px-4 py-2 resize-none min-h-[3rem] mb-2"
           />
