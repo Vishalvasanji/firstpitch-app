@@ -1,4 +1,16 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { db, auth } from "../firebase";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 export default function CreateQuiz() {
   const saved = sessionStorage.getItem("quizData");
@@ -10,6 +22,27 @@ export default function CreateQuiz() {
   const [dueDate, setDueDate] = useState("");
   const [assignToTeam, setAssignToTeam] = useState(true);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const navigate = useNavigate();
+  const teamId = sessionStorage.getItem("currentTeamId");
+  const coachId = auth.currentUser?.uid;
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (!teamId) return;
+      const q = query(collection(db, "users"), where("teamId", "==", teamId), where("role", "==", "player"), where("verified", "==", true));
+      const snapshot = await getDocs(q);
+      const playerList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setPlayers(playerList);
+    };
+    fetchPlayers();
+  }, [teamId]);
+
+  const togglePlayer = (id) => {
+    setSelectedPlayers((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+    );
+  };
 
   const updateQuestion = (i, value) => {
     const updated = [...questions];
@@ -27,6 +60,68 @@ export default function CreateQuiz() {
     const updated = [...questions];
     updated[i].answerIndex = index;
     setQuestions(updated);
+  };
+
+  const handleSubmit = async () => {
+    // Validation
+    if (!title || !dueDate || !questions.length) {
+      alert("Please complete all required fields.");
+      return;
+    }
+
+    for (let q of questions) {
+      if (!q.question || q.options.length !== 4 || q.answerIndex === null || q.answerIndex === undefined) {
+        alert("Please complete all questions and select correct answers.");
+        return;
+      }
+    }
+
+    const assignedTo = assignToTeam
+      ? players.map((p) => p.id)
+      : selectedPlayers;
+
+    if (assignedTo.length === 0) {
+      alert("You must assign the quiz to at least one player.");
+      return;
+    }
+
+    try {
+      // Save quiz
+      const quizRef = await addDoc(collection(db, "quizzes"), {
+        title,
+        questions,
+        createdBy: coachId,
+        createdAt: serverTimestamp(),
+      });
+
+      // Save assignment
+      const assignmentRef = await addDoc(collection(db, "assignments"), {
+        contentId: quizRef.id,
+        teamId,
+        type: "quiz",
+        dueDate,
+        assignedTo,
+        assignedBy: coachId,
+        createdAt: serverTimestamp(),
+      });
+
+      // Save statuses
+      const promises = assignedTo.map((playerId) =>
+        addDoc(collection(db, "assignmentStatuses"), {
+          assignmentId: assignmentRef.id,
+          playerId,
+          status: "assigned",
+          lastUpdated: serverTimestamp(),
+        })
+      );
+      await Promise.all(promises);
+
+      alert("Quiz successfully assigned!");
+      navigate("/quizzes");
+    } catch (err) {
+      console.error("Error submitting quiz:", err);
+      alert("Failed to submit quiz. Please try again.");
+    }
   };
 
   if (!quizData) {
@@ -112,13 +207,27 @@ export default function CreateQuiz() {
         </button>
       </div>
 
-      {/* Placeholder for players list */}
       {!assignToTeam && (
-        <p className="text-sm text-gray-500 mb-2">[Player list goes here]</p>
+        <div className="mb-4">
+          {players.map((player) => (
+            <div
+              key={player.id}
+              onClick={() => togglePlayer(player.id)}
+              className={`flex items-center bg-white shadow rounded-xl p-3 mb-2 cursor-pointer ${
+                selectedPlayers.includes(player.id) ? "border border-blue-600" : ""
+              }`}
+            >
+              <div className="w-10 h-10 bg-blue-100 text-blue-800 font-bold rounded-full flex items-center justify-center mr-3">
+                {player.name.split(" ").map((n) => n[0]).join("")}
+              </div>
+              <p className="text-md font-semibold text-gray-800">{player.name}</p>
+            </div>
+          ))}
+        </div>
       )}
 
       <button
-        onClick={() => alert("Send Quiz logic here")}
+        onClick={handleSubmit}
         className="bg-blue-600 text-white font-semibold px-4 py-3 rounded-lg w-full mt-6"
       >
         Send Quiz
