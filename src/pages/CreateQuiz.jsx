@@ -131,12 +131,12 @@ export default function CreateQuiz() {
   <button className="text-blue-600">← Back</button>
   <h1 className="text-lg font-bold text-blue-800 text-center flex-1 -ml-6">Create Quiz</h1>
 </div>
-<p className="text-sm text-gray-600 text-center mt-1 mb-4">
+<p className="text-sm text-gray-600 text-left mt-1 mb-4">
   Edit each question, update the answer options, and tap one to mark it correct.
 </p>
 
       {/* Quiz Title */}
-      <label className="text-sm font-semibold text-gray-700 block mb-1">Quiz Title</label>
+      <label className="block font-semibold mb-2">Quiz Title</label>
       <input
         type="text"
         value={title}
@@ -169,7 +169,7 @@ export default function CreateQuiz() {
                 value={opt}
                 onChange={(e) => updateOption(i, j, e.target.value)}
                 rows={1}
-                className="w-full bg-transparent focus:outline-none text-sm text-gray-800 resize-none min-h-[2.5rem]"
+                className="w-full bg-transparent focus:outline-none text-sm text-gray-800 resize-none min-h-[3rem]"
               />
             </div>
           ))}
