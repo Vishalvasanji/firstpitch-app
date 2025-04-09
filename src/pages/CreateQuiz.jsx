@@ -127,15 +127,16 @@ export default function CreateQuiz() {
   return (
     <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
       {/* Header */}
-      <div className="mb-2">
-        <h1 className="text-lg font-bold text-blue-800 text-center">Create Quiz</h1>
-        <p className="text-sm text-gray-600 text-center mt-1 mb-4">
-          Edit each question, update the answer options, and tap one to mark it correct.
-        </p>
-      </div>
+      <div className="flex items-center justify-between mb-4">
+  <button className="text-blue-600">← Back</button>
+  <h1 className="text-lg font-bold text-blue-800 text-center flex-1 -ml-6">Create Quiz</h1>
+</div>
+<p className="text-sm text-gray-600 text-center mt-1 mb-4">
+  Edit each question, update the answer options, and tap one to mark it correct.
+</p>
 
       {/* Quiz Title */}
-      <label className="block text-sm font-medium text-gray-700 mb-1">Quiz Title</label>
+      <label className="text-sm font-semibold text-gray-700 block mb-1">Quiz Title</label>
       <input
         type="text"
         value={title}
