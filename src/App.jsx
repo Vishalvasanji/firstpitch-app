@@ -63,7 +63,7 @@ function App() {
           element={
             <PrivateRoute>
               <CreateQuiz />
-            <PrivateRoute>
+            </PrivateRoute>
           }
         />
       </Routes>
