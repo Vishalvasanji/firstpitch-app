@@ -1,8 +1,31 @@
 import { useState } from "react";
 
-export default function GenerateQuizModal({ handleClose, handleGenerate, ageGroup }) {
+export default function GenerateQuizModal({ handleClose, ageGroup }) {
   const [topic, setTopic] = useState("");
   const [scenario, setScenario] = useState("");
+
+  const handleGenerate = async () => {
+    try {
+      const res = await fetch("/api/generateQuiz", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ topic, scenario, ageGroup, questionCount: 3 }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        sessionStorage.setItem("quizData", JSON.stringify(data));
+        window.location.href = "/create-quiz";
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (err) {
+      console.error("Failed to generate quiz:", err);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-white z-50 px-4 pt-6 pb-28 overflow-y-auto">
@@ -37,7 +60,7 @@ export default function GenerateQuizModal({ handleClose, handleGenerate, ageGrou
 
       <button
         disabled={!topic}
-        onClick={() => handleGenerate({ topic, questionCount: 3, scenario, ageGroup })}
+        onClick={handleGenerate}
         className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg w-full disabled:opacity-50"
       >
         Generate Questions
