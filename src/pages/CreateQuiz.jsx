@@ -63,7 +63,6 @@ export default function CreateQuiz() {
   };
 
   const handleSubmit = async () => {
-    // Validation
     if (!title || !dueDate || !questions.length) {
       alert("Please complete all required fields.");
       return;
@@ -86,7 +85,6 @@ export default function CreateQuiz() {
     }
 
     try {
-      // Save quiz
       const quizRef = await addDoc(collection(db, "quizzes"), {
         title,
         questions,
@@ -94,7 +92,6 @@ export default function CreateQuiz() {
         createdAt: serverTimestamp(),
       });
 
-      // Save assignment
       const assignmentRef = await addDoc(collection(db, "assignments"), {
         contentId: quizRef.id,
         teamId,
@@ -105,7 +102,6 @@ export default function CreateQuiz() {
         createdAt: serverTimestamp(),
       });
 
-      // Save statuses
       const promises = assignedTo.map((playerId) =>
         addDoc(collection(db, "assignmentStatuses"), {
           assignmentId: assignmentRef.id,
@@ -131,12 +127,15 @@ export default function CreateQuiz() {
   return (
     <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <button className="text-blue-600 font-medium">← Back</button>
-        <h1 className="text-xl font-bold text-blue-800 text-center">Create Quiz</h1>
+      <div className="mb-2">
+        <h1 className="text-lg font-bold text-blue-800 text-center">Create Quiz</h1>
+        <p className="text-sm text-gray-600 text-center mt-1 mb-4">
+          Edit each question, update the answer options, and tap one to mark it correct.
+        </p>
       </div>
 
-      {/* Title Input */}
+      {/* Quiz Title */}
+      <label className="block text-sm font-medium text-gray-700 mb-1">Quiz Title</label>
       <input
         type="text"
         value={title}
@@ -149,10 +148,11 @@ export default function CreateQuiz() {
       {questions.map((q, i) => (
         <div key={i} className="mb-6">
           <label className="block font-semibold mb-2">Question {i + 1}</label>
-          <input
+          <textarea
             value={q.question}
             onChange={(e) => updateQuestion(i, e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 mb-2"
+            rows={1}
+            className="w-full border rounded-lg px-4 py-2 resize-none min-h-[3rem] mb-2"
           />
           {q.options.map((opt, j) => (
             <div
@@ -164,10 +164,11 @@ export default function CreateQuiz() {
                   : "border-gray-300 bg-white"
               }`}
             >
-              <input
+              <textarea
                 value={opt}
                 onChange={(e) => updateOption(i, j, e.target.value)}
-                className="w-full bg-transparent focus:outline-none text-sm text-gray-800"
+                rows={1}
+                className="w-full bg-transparent focus:outline-none text-sm text-gray-800 resize-none min-h-[2.5rem]"
               />
             </div>
           ))}
@@ -175,13 +176,15 @@ export default function CreateQuiz() {
       ))}
 
       {/* Due Date */}
-      <label className="block font-semibold mb-2">Due Date</label>
-      <input
-        type="date"
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-        className="w-full border rounded-lg px-4 py-2 mb-6"
-      />
+      <div className="flex items-center space-x-3 mb-4">
+        <label className="text-sm font-medium text-gray-700">Due Date</label>
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className="border rounded-lg px-3 py-2"
+        />
+      </div>
 
       {/* Assign To */}
       <div className="flex space-x-2 mb-4">
