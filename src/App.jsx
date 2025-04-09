@@ -9,6 +9,7 @@ import VerifyCode from "./pages/VerifyCode";
 import CreateAssignment from "./pages/CreateAssignment";
 import CreateDrill from "./pages/CreateDrill";
 import Drills from "./pages/Drills";
+import CreateQuiz from "./pages/CreateQuiz";
 
 function App() {
   return (
@@ -55,6 +56,14 @@ function App() {
             <PrivateRoute>
               <Drills />
             </PrivateRoute>
+          }
+        />
+        <Route 
+          path="/create-quiz"
+          element={
+            <PrivateRoute>
+              <CreateQuiz />
+            <PrivateRoute>
           }
         />
       </Routes>
