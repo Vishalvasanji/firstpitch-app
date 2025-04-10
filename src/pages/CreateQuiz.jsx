@@ -5,8 +5,6 @@ import {
   collection,
   addDoc,
   serverTimestamp,
-  doc,
-  getDoc,
   getDocs,
   query,
   where,
@@ -23,6 +21,10 @@ export default function CreateQuiz() {
   const [assignToTeam, setAssignToTeam] = useState(true);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [players, setPlayers] = useState([]);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState([]);
+  const [editingOption, setEditingOption] = useState([]);
+
   const navigate = useNavigate();
   const teamId = sessionStorage.getItem("currentTeamId");
   const coachId = auth.currentUser?.uid;
@@ -30,7 +32,12 @@ export default function CreateQuiz() {
   useEffect(() => {
     const fetchPlayers = async () => {
       if (!teamId) return;
-      const q = query(collection(db, "users"), where("teamId", "==", teamId), where("role", "==", "player"), where("verified", "==", true));
+      const q = query(
+        collection(db, "users"),
+        where("teamId", "==", teamId),
+        where("role", "==", "player"),
+        where("verified", "==", true)
+      );
       const snapshot = await getDocs(q);
       const playerList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setPlayers(playerList);
@@ -62,6 +69,31 @@ export default function CreateQuiz() {
     setQuestions(updated);
   };
 
+  const startEditingQuestion = (i) => {
+    const updated = [...editingQuestion];
+    updated[i] = true;
+    setEditingQuestion(updated);
+  };
+
+  const setEditingQuestionOff = (i) => {
+    const updated = [...editingQuestion];
+    updated[i] = false;
+    setEditingQuestion(updated);
+  };
+
+  const startEditingOption = (i, j) => {
+    const updated = [...editingOption];
+    if (!updated[i]) updated[i] = [];
+    updated[i][j] = true;
+    setEditingOption(updated);
+  };
+
+  const setEditingOptionOff = (i, j) => {
+    const updated = [...editingOption];
+    if (updated[i]) updated[i][j] = false;
+    setEditingOption(updated);
+  };
+
   const handleSubmit = async () => {
     if (!title || !dueDate || !questions.length) {
       alert("Please complete all required fields.");
@@ -75,9 +107,7 @@ export default function CreateQuiz() {
       }
     }
 
-    const assignedTo = assignToTeam
-      ? players.map((p) => p.id)
-      : selectedPlayers;
+    const assignedTo = assignToTeam ? players.map((p) => p.id) : selectedPlayers;
 
     if (assignedTo.length === 0) {
       alert("You must assign the quiz to at least one player.");
@@ -126,61 +156,73 @@ export default function CreateQuiz() {
 
   return (
     <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-  <button className="text-blue-600">← Back</button>
-  <h1 className="text-lg font-bold text-blue-800 text-center flex-1 -ml-6">Create Quiz</h1>
-</div>
-<p className="text-sm text-gray-600 text-left mt-1 mb-4">
-  Edit each question, update the answer options, and tap one to mark it correct.
-</p>
+        <button className="text-blue-600">← Back</button>
+        <h1 className="text-lg font-bold text-blue-800 text-center flex-1 -ml-6">Create Quiz</h1>
+      </div>
+      <div className="flex justify-between items-center mb-2">
+        <label className="text-sm font-semibold text-gray-700">Quiz Title</label>
+        <button onClick={() => setEditingTitle(true)}>✏️</button>
+      </div>
+      {editingTitle ? (
+        <textarea
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={() => setEditingTitle(false)}
+          autoFocus
+          className="w-full border rounded-lg px-4 py-2 resize-none text-base text-gray-800 mb-4"
+        />
+      ) : (
+        <p className="text-base text-gray-800 mb-4">{title}</p>
+      )}
 
-      {/* Quiz Title */}
-      <label className="block font-semibold mb-2">Quiz Title</label>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Enter quiz title"
-        className="w-full border rounded-lg px-4 py-2 mb-4"
-      />
-
-      {/* Questions */}
       {questions.map((q, i) => (
         <div key={i} className="mb-6">
-          <label className="block font-semibold mb-2">Question {i + 1}</label>
-          <textarea
-            value={q.question}
-            onChange={(e) => updateQuestion(i, e.target.value)}
-            onInput={(e) => {
-              e.target.style.height = 'auto'; // reset first
-              e.target.style.height = `${e.target.scrollHeight}px`; // then grow to fit
-            }}
-            rows={1}
-            className="w-full border rounded-lg px-4 py-2 resize-none min-h-[3rem] mb-2"
-          />
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-sm font-semibold text-gray-700">Question {i + 1}</label>
+            <button onClick={() => startEditingQuestion(i)}>✏️</button>
+          </div>
+          {editingQuestion[i] ? (
+            <textarea
+              value={q.question}
+              onChange={(e) => updateQuestion(i, e.target.value)}
+              onBlur={() => setEditingQuestionOff(i)}
+              autoFocus
+              className="w-full border rounded-lg px-4 py-2 resize-none text-base text-gray-800 mb-2"
+            />
+          ) : (
+            <p className="text-base text-gray-800 whitespace-pre-wrap mb-2">{q.question}</p>
+          )}
+
           {q.options.map((opt, j) => (
             <div
               key={j}
               onClick={() => updateCorrectAnswer(i, j)}
               className={`border rounded-lg px-3 py-2 mb-2 cursor-pointer ${
-                q.answerIndex === j
-                  ? "border-green-500 bg-green-50"
-                  : "border-gray-300 bg-white"
+                q.answerIndex === j ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"
               }`}
             >
-              <textarea
-                value={opt}
-                onChange={(e) => updateOption(i, j, e.target.value)}
-                rows={1}
-                className="w-full bg-transparent focus:outline-none text-sm text-gray-800 resize-none min-h-[3rem]"
-              />
+              {editingOption[i]?.[j] ? (
+                <input
+                  value={opt}
+                  onChange={(e) => updateOption(i, j, e.target.value)}
+                  onBlur={() => setEditingOptionOff(i, j)}
+                  autoFocus
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                />
+              ) : (
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-800">
+                    {String.fromCharCode(65 + j)}. {opt}
+                  </p>
+                  <button onClick={(e) => { e.stopPropagation(); startEditingOption(i, j); }}>✏️</button>
+                </div>
+              )}
             </div>
           ))}
         </div>
       ))}
 
-      {/* Due Date */}
       <div className="flex items-center space-x-3 mb-4">
         <label className="text-sm font-medium text-gray-700">Due Date</label>
         <input
@@ -191,14 +233,11 @@ export default function CreateQuiz() {
         />
       </div>
 
-      {/* Assign To */}
       <div className="flex space-x-2 mb-4">
         <button
           onClick={() => setAssignToTeam(true)}
           className={`px-4 py-2 rounded-full text-sm font-medium ${
-            assignToTeam
-              ? "bg-blue-600 text-white"
-              : "bg-white text-blue-600 border border-blue-600"
+            assignToTeam ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"
           }`}
         >
           Entire Team
@@ -206,9 +245,7 @@ export default function CreateQuiz() {
         <button
           onClick={() => setAssignToTeam(false)}
           className={`px-4 py-2 rounded-full text-sm font-medium ${
-            !assignToTeam
-              ? "bg-blue-600 text-white"
-              : "bg-white text-blue-600 border border-blue-600"
+            !assignToTeam ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"
           }`}
         >
           Specific Players
