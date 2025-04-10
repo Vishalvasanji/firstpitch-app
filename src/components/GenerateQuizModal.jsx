@@ -1,10 +1,19 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function GenerateQuizModal({ handleClose, ageGroup }) {
   const [topic, setTopic] = useState("");
   const [scenario, setScenario] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleGenerate = async () => {
+    setLoading(true);
+    const timeout = setTimeout(() => {
+      alert("The quiz generation is taking too long. Please try again.");
+      setLoading(false);
+    }, 30000);
+
     try {
       const res = await fetch("/api/generateQuiz", {
         method: "POST",
@@ -14,16 +23,22 @@ export default function GenerateQuizModal({ handleClose, ageGroup }) {
         body: JSON.stringify({ topic, scenario, ageGroup, questionCount: 3 }),
       });
 
+      clearTimeout(timeout);
+
       const data = await res.json();
 
       if (res.ok) {
         sessionStorage.setItem("quizData", JSON.stringify(data));
-        window.location.href = "/create-quiz";
+        navigate("/create-quiz", { state: data });
       } else {
-        alert("Error: " + data.error);
+        alert("Something went wrong while generating the quiz. Please try again.");
+        setLoading(false);
       }
     } catch (err) {
+      clearTimeout(timeout);
       console.error("Failed to generate quiz:", err);
+      alert("Something went wrong while generating the quiz. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -48,6 +63,7 @@ export default function GenerateQuizModal({ handleClose, ageGroup }) {
         placeholder="Enter quiz topic"
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
+        disabled={loading}
         className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 h-12"
       />
 
@@ -55,15 +71,23 @@ export default function GenerateQuizModal({ handleClose, ageGroup }) {
         placeholder="Optional scenario or coaching context..."
         value={scenario}
         onChange={(e) => setScenario(e.target.value)}
+        disabled={loading}
         className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
       />
 
       <button
-        disabled={!topic}
+        disabled={loading || !topic}
         onClick={handleGenerate}
-        className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg w-full disabled:opacity-50"
+        className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg w-full disabled:opacity-60 flex items-center justify-center"
       >
-        Generate Questions
+        {loading ? (
+          <>
+            <span className="animate-spin mr-2">🌀</span>
+            Generating quiz...
+          </>
+        ) : (
+          "Generate Questions"
+        )}
       </button>
     </div>
   );
