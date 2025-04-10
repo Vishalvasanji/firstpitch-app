@@ -1,3 +1,4 @@
+// Fix: make answers editable when a question is in edit mode + Save icon for title too
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db, auth } from "../firebase";
@@ -148,13 +149,16 @@ export default function CreateQuiz() {
       </div>
       <div className="flex justify-between items-center mb-2">
         <label className="text-md font-medium text-gray-700">Quiz Title</label>
-        <button onClick={() => setEditingTitle(true)}>✏️</button>
+        {editingTitle ? (
+          <button onClick={() => setEditingTitle(false)}>💾</button>
+        ) : (
+          <button onClick={() => setEditingTitle(true)}>✏️</button>
+        )}
       </div>
       {editingTitle ? (
         <textarea
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          onBlur={() => setEditingTitle(false)}
           autoFocus
           className="w-full border rounded-lg px-4 py-2 resize-none text-lg font-semibold text-gray-800 mb-4"
         />
@@ -168,13 +172,16 @@ export default function CreateQuiz() {
         <div key={i} className="mb-6">
           <div className="flex justify-between items-center mb-1">
             <label className="text-md font-medium text-gray-700">Question {i + 1}</label>
-            <button onClick={() => startEditingQuestion(i)}>✏️</button>
+            {editingQuestion[i] ? (
+              <button onClick={() => setEditingQuestionOff(i)}>💾</button>
+            ) : (
+              <button onClick={() => startEditingQuestion(i)}>✏️</button>
+            )}
           </div>
           {editingQuestion[i] ? (
             <textarea
               value={q.question}
               onChange={(e) => updateQuestion(i, e.target.value)}
-              onBlur={() => setEditingQuestionOff(i)}
               autoFocus
               className="w-full border rounded-lg px-4 py-2 resize-none text-base text-gray-800 mb-2"
             />
