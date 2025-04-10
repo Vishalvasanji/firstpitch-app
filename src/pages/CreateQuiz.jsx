@@ -1,4 +1,4 @@
-// Fix: remove green highlight while editing answers
+// Fix: remove card styling when editing answers
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db, auth } from "../firebase";
@@ -192,27 +192,29 @@ export default function CreateQuiz() {
           {q.options.map((opt, j) => {
             const isSelected = q.answerIndex === j;
             const isEditing = editingQuestion[i];
-            const baseStyle = "border rounded-lg px-3 py-2 mb-2 cursor-pointer";
-            const selectedStyle = isSelected && !isEditing ? "border-green-500 bg-green-50" : "border-gray-300 bg-white";
+
+            if (isEditing) {
+              return (
+                <input
+                  key={j}
+                  value={opt}
+                  onChange={(e) => updateOption(i, j, e.target.value)}
+                  className="w-full border rounded-lg px-3 py-2 text-base mb-2"
+                />
+              );
+            }
+
             return (
               <div
                 key={j}
-                onClick={() => !isEditing && updateCorrectAnswer(i, j)}
-                className={`${baseStyle} ${selectedStyle}`}
+                onClick={() => updateCorrectAnswer(i, j)}
+                className={`border rounded-lg px-3 py-2 mb-2 cursor-pointer ${
+                  isSelected ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"
+                }`}
               >
-                {isEditing ? (
-                  <input
-                    value={opt}
-                    onChange={(e) => updateOption(i, j, e.target.value)}
-                    className="w-full border rounded-lg px-3 py-2 text-base"
-                  />
-                ) : (
-                  <div className="flex justify-between items-center">
-                    <p className="text-base text-gray-800">
-                      {String.fromCharCode(65 + j)}. {opt.replace(/^([A-D]\.\s)*/, "")}
-                    </p>
-                  </div>
-                )}
+                <p className="text-base text-gray-800">
+                  {String.fromCharCode(65 + j)}. {opt.replace(/^([A-D]\.\s)*/, "")}
+                </p>
               </div>
             );
           })}
