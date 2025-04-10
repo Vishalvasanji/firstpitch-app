@@ -1,4 +1,4 @@
-// Fix: make answers editable when a question is in edit mode + Save icon for title too
+// Fix: remove green highlight while editing answers
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db, auth } from "../firebase";
@@ -189,29 +189,33 @@ export default function CreateQuiz() {
             <p className="text-base text-gray-800 whitespace-pre-wrap mb-2">{q.question}</p>
           )}
 
-          {q.options.map((opt, j) => (
-            <div
-              key={j}
-              onClick={() => updateCorrectAnswer(i, j)}
-              className={`border rounded-lg px-3 py-2 mb-2 cursor-pointer ${
-                q.answerIndex === j ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"
-              }`}
-            >
-              {editingQuestion[i] ? (
-                <input
-                  value={opt}
-                  onChange={(e) => updateOption(i, j, e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-base"
-                />
-              ) : (
-                <div className="flex justify-between items-center">
-                  <p className="text-base text-gray-800">
-                    {String.fromCharCode(65 + j)}. {opt.replace(/^([A-D]\.\s)*/, "")}
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
+          {q.options.map((opt, j) => {
+            const isSelected = q.answerIndex === j;
+            const isEditing = editingQuestion[i];
+            const baseStyle = "border rounded-lg px-3 py-2 mb-2 cursor-pointer";
+            const selectedStyle = isSelected && !isEditing ? "border-green-500 bg-green-50" : "border-gray-300 bg-white";
+            return (
+              <div
+                key={j}
+                onClick={() => !isEditing && updateCorrectAnswer(i, j)}
+                className={`${baseStyle} ${selectedStyle}`}
+              >
+                {isEditing ? (
+                  <input
+                    value={opt}
+                    onChange={(e) => updateOption(i, j, e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 text-base"
+                  />
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <p className="text-base text-gray-800">
+                      {String.fromCharCode(65 + j)}. {opt.replace(/^([A-D]\.\s)*/, "")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           <hr className="border-t border-gray-300 mt-4" />
         </div>
