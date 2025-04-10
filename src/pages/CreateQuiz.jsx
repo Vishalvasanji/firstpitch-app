@@ -23,7 +23,6 @@ export default function CreateQuiz() {
   const [players, setPlayers] = useState([]);
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState([]);
-  const [editingOption, setEditingOption] = useState([]);
 
   const navigate = useNavigate();
   const teamId = sessionStorage.getItem("currentTeamId");
@@ -79,19 +78,6 @@ export default function CreateQuiz() {
     const updated = [...editingQuestion];
     updated[i] = false;
     setEditingQuestion(updated);
-  };
-
-  const startEditingOption = (i, j) => {
-    const updated = [...editingOption];
-    if (!updated[i]) updated[i] = [];
-    updated[i][j] = true;
-    setEditingOption(updated);
-  };
-
-  const setEditingOptionOff = (i, j) => {
-    const updated = [...editingOption];
-    if (updated[i]) updated[i][j] = false;
-    setEditingOption(updated);
   };
 
   const handleSubmit = async () => {
@@ -161,7 +147,7 @@ export default function CreateQuiz() {
         <h1 className="text-lg font-bold text-blue-800 text-center flex-1 -ml-6">Create Quiz</h1>
       </div>
       <div className="flex justify-between items-center mb-2">
-        <label className="text-sm font-semibold text-gray-700">Quiz Title</label>
+        <label className="text-md font-medium text-gray-700">Quiz Title</label>
         <button onClick={() => setEditingTitle(true)}>✏️</button>
       </div>
       {editingTitle ? (
@@ -170,16 +156,18 @@ export default function CreateQuiz() {
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => setEditingTitle(false)}
           autoFocus
-          className="w-full border rounded-lg px-4 py-2 resize-none text-base text-gray-800 mb-4"
+          className="w-full border rounded-lg px-4 py-2 resize-none text-lg font-semibold text-gray-800 mb-4"
         />
       ) : (
-        <p className="text-base text-gray-800 mb-4">{title}</p>
+        <p className="text-lg font-semibold text-gray-800 mb-4">{title}</p>
       )}
+
+      <hr className="border-t border-gray-300 mb-4" />
 
       {questions.map((q, i) => (
         <div key={i} className="mb-6">
           <div className="flex justify-between items-center mb-1">
-            <label className="text-sm font-semibold text-gray-700">Question {i + 1}</label>
+            <label className="text-md font-medium text-gray-700">Question {i + 1}</label>
             <button onClick={() => startEditingQuestion(i)}>✏️</button>
           </div>
           {editingQuestion[i] ? (
@@ -202,24 +190,23 @@ export default function CreateQuiz() {
                 q.answerIndex === j ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"
               }`}
             >
-              {editingOption[i]?.[j] ? (
+              {editingQuestion[i] ? (
                 <input
                   value={opt}
                   onChange={(e) => updateOption(i, j, e.target.value)}
-                  onBlur={() => setEditingOptionOff(i, j)}
-                  autoFocus
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  className="w-full border rounded-lg px-3 py-2 text-base"
                 />
               ) : (
                 <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-800">
-                    {String.fromCharCode(65 + j)}. {opt}
+                  <p className="text-base text-gray-800">
+                    {String.fromCharCode(65 + j)}. {opt.replace(/^([A-D]\.\s)*/, "")}
                   </p>
-                  <button onClick={(e) => { e.stopPropagation(); startEditingOption(i, j); }}>✏️</button>
                 </div>
               )}
             </div>
           ))}
+
+          <hr className="border-t border-gray-300 mt-4" />
         </div>
       ))}
 
