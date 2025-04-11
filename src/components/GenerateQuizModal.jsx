@@ -29,7 +29,7 @@ export default function GenerateQuizModal({ handleClose, ageGroup }) {
 
       if (res.ok) {
         sessionStorage.setItem("quizData", JSON.stringify(data));
-        navigate("/create-quiz", { state: data });
+        window.location.href = "/create-quiz";
       } else {
         alert("Something went wrong while generating the quiz. Please try again.");
         setLoading(false);
