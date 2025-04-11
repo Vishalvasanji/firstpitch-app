@@ -1,5 +1,3 @@
-is this correct:
-
 // Fix: sessionStorage hydration and loading fallback
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
