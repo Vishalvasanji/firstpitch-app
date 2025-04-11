@@ -1,94 +1,160 @@
-import { useState } from "react";
+// Fix: sessionStorage hydration and loading fallback
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { db, auth } from "../firebase";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
-export default function GenerateQuizModal({ handleClose, ageGroup }) {
-  const [topic, setTopic] = useState("");
-  const [scenario, setScenario] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function CreateQuiz() {
+  const [quizData, setQuizData] = useState(null);
+  const [title, setTitle] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [dueDate, setDueDate] = useState("");
+  const [assignToTeam, setAssignToTeam] = useState(true);
+  const [selectedPlayers, setSelectedPlayers] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState([]);
+
   const navigate = useNavigate();
+  const teamId = sessionStorage.getItem("currentTeamId");
+  const coachId = auth.currentUser?.uid;
 
-  const handleGenerate = async () => {
-    setLoading(true);
-    const timeout = setTimeout(() => {
-      alert("The quiz generation is taking too long. Please try again.");
-      setLoading(false);
-    }, 30000);
+  useEffect(() => {
+    const saved = sessionStorage.getItem("quizData");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setQuizData(parsed);
+      setTitle(parsed.title || "");
+      setQuestions(parsed.questions || []);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (!teamId) return;
+      const q = query(
+        collection(db, "users"),
+        where("teamId", "==", teamId),
+        where("role", "==", "player"),
+        where("verified", "==", true)
+      );
+      const snapshot = await getDocs(q);
+      const playerList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setPlayers(playerList);
+    };
+    fetchPlayers();
+  }, [teamId]);
+
+  const togglePlayer = (id) => {
+    setSelectedPlayers((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+    );
+  };
+
+  const updateQuestion = (i, value) => {
+    const updated = [...questions];
+    updated[i].question = value;
+    setQuestions(updated);
+  };
+
+  const updateOption = (i, j, value) => {
+    const updated = [...questions];
+    updated[i].options[j] = value;
+    setQuestions(updated);
+  };
+
+  const updateCorrectAnswer = (i, index) => {
+    const updated = [...questions];
+    updated[i].answerIndex = index;
+    setQuestions(updated);
+  };
+
+  const startEditingQuestion = (i) => {
+    const updated = [...editingQuestion];
+    updated[i] = true;
+    setEditingQuestion(updated);
+  };
+
+  const setEditingQuestionOff = (i) => {
+    const updated = [...editingQuestion];
+    updated[i] = false;
+    setEditingQuestion(updated);
+  };
+
+  const handleSubmit = async () => {
+    if (!title || !dueDate || !questions.length) {
+      alert("Please complete all required fields.");
+      return;
+    }
+
+    for (let q of questions) {
+      if (!q.question || q.options.length !== 4 || q.answerIndex === null || q.answerIndex === undefined) {
+        alert("Please complete all questions and select correct answers.");
+        return;
+      }
+    }
+
+    const assignedTo = assignToTeam ? players.map((p) => p.id) : selectedPlayers;
+
+    if (assignedTo.length === 0) {
+      alert("You must assign the quiz to at least one player.");
+      return;
+    }
 
     try {
-      const res = await fetch("/api/generateQuiz", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ topic, scenario, ageGroup, questionCount: 3 }),
+      const quizRef = await addDoc(collection(db, "quizzes"), {
+        title,
+        questions,
+        createdBy: coachId,
+        createdAt: serverTimestamp(),
       });
 
-      clearTimeout(timeout);
+      const assignmentRef = await addDoc(collection(db, "assignments"), {
+        contentId: quizRef.id,
+        teamId,
+        type: "quiz",
+        dueDate,
+        assignedTo,
+        assignedBy: coachId,
+        createdAt: serverTimestamp(),
+      });
 
-      const data = await res.json();
+      const promises = assignedTo.map((playerId) =>
+        addDoc(collection(db, "assignmentStatuses"), {
+          assignmentId: assignmentRef.id,
+          playerId,
+          status: "assigned",
+          lastUpdated: serverTimestamp(),
+        })
+      );
+      await Promise.all(promises);
 
-      if (res.ok) {
-        sessionStorage.setItem("quizData", JSON.stringify(data));
-        window.location.href = "/create-quiz";
-      } else {
-        alert("Something went wrong while generating the quiz. Please try again.");
-        setLoading(false);
-      }
+      alert("Quiz successfully assigned!");
+      navigate("/quizzes");
     } catch (err) {
-      clearTimeout(timeout);
-      console.error("Failed to generate quiz:", err);
-      alert("Something went wrong while generating the quiz. Please try again.");
-      setLoading(false);
+      console.error("Error submitting quiz:", err);
+      alert("Failed to submit quiz. Please try again.");
     }
   };
 
+  if (quizData === null) {
+    return <p className="p-6 text-gray-500">Loading quiz data...</p>;
+  }
+
+  if (!quizData || !quizData.questions || quizData.questions.length === 0) {
+  return <p className="p-6 text-red-600">Quiz is missing questions or could not be loaded.</p>;
+}
+
   return (
-    <div className="fixed inset-0 bg-white z-50 px-4 pt-6 pb-28 overflow-y-auto">
-      {/* Top Bar */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold text-blue-800">Generate Quiz with AI</h1>
-        <button onClick={handleClose} className="text-blue-600 font-medium">
-          Close
-        </button>
-      </div>
-
-      {/* Explainer Text */}
-      <p className="text-sm text-gray-600 mb-4">
-        Tell us what the quiz should cover. We'll generate age-appropriate questions your team can answer in-app. You’ll be able to review and edit the questions and answers before sending.
-      </p>
-
-      {/* Form Fields */}
-      <input
-        type="text"
-        placeholder="Enter quiz topic"
-        value={topic}
-        onChange={(e) => setTopic(e.target.value)}
-        disabled={loading}
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 h-12"
-      />
-
-      <textarea
-        placeholder="Optional scenario or coaching context..."
-        value={scenario}
-        onChange={(e) => setScenario(e.target.value)}
-        disabled={loading}
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
-      />
-
-      <button
-        disabled={loading || !topic}
-        onClick={handleGenerate}
-        className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg w-full disabled:opacity-60 flex items-center justify-center"
-      >
-        {loading ? (
-          <>
-            <span className="animate-spin mr-2">🌀</span>
-            Generating quiz...
-          </>
-        ) : (
-          "Generate Questions"
-        )}
-      </button>
+    <div className="min-h-screen overflow-y-auto bg-gradient-to-b from-white to-blue-50 px-4 pt-6 pb-28">
+      {/* full UI here */}
     </div>
   );
 }
