@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 
 export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose }) {
@@ -58,59 +58,81 @@ export default function DrillDetailsModal({ drill, assignmentId, teamId, onClose
   const isClosed = new Date(drill.dueDate) < new Date();
 
   return (
-    <div className="fixed inset-0 bg-white z-50 px-4 pt-6 pb-28 overflow-y-auto">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-blue-800 text-left">{drill.title}</h2>
-          <span className={`text-xs font-medium px-2 py-1 rounded-full ${isClosed ? 'bg-gray-200 text-gray-700' : 'bg-green-100 text-green-700'}`}>
-            {isClosed ? 'Closed' : 'Open'}
-          </span>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="sticky top-0 bg-white border-b border-gray-100 p-4 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{drill.title}</h2>
+            <p className="text-sm text-gray-500">Due: {formatDate(drill.dueDate)}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+              isClosed ? 'bg-gray-100 text-gray-700' : 'bg-green-100 text-green-700'
+            }`}>
+              {isClosed ? 'Closed' : 'Open'}
+            </span>
+            <button 
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <button onClick={onClose} className="text-blue-600 font-medium">Close</button>
-      </div>
 
-      {thumbnailUrl && (
-        <img
-          src={thumbnailUrl}
-          alt="Video thumbnail"
-          className="w-full max-w-md mx-auto rounded-lg shadow-md aspect-video object-cover mb-4"
-        />
-      )}
-
-      <p className="text-xl font-semibold text-gray-600 mb-4 text-left">Due: {formatDate(drill.dueDate)}</p>
-
-      <div className="flex items-center gap-2 mb-1">
-  <p className="text-xl font-semibold text-green-600">Completed</p>
-  <span className="text-xl font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">
-    {completed.length}
-  </span>
-</div>
-      <div className="space-y-2 mb-4">
-        {completed.map(player => (
-          <div key={player.id} className="flex items-center bg-white shadow rounded-xl p-3">
-            <div className="w-10 h-10 bg-blue-100 text-blue-800 font-bold rounded-full flex items-center justify-center mr-3">
-              {`${player.firstName[0]}${player.lastName[0]}`}
+        <div className="p-4 space-y-6">
+          {thumbnailUrl && (
+            <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
+              <img
+                src={thumbnailUrl}
+                alt="Video thumbnail"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <p className="text-md font-semibold text-gray-800">{player.firstName} {player.lastName}</p>
-          </div>
-        ))}
-      </div>
+          )}
 
-      <div className="flex items-center gap-2 mb-1">
-  <p className="text-xl font-semibold text-red-600">Not Completed</p>
-  <span className="text-xl font-semibold bg-red-100 text-red-800 px-2 py-1 rounded-full">
-    {incomplete.length}
-  </span>
-</div>
-      <div className="space-y-2 mb-4">
-        {incomplete.map(player => (
-          <div key={player.id} className="flex items-center bg-white shadow rounded-xl p-3">
-            <div className="w-10 h-10 bg-blue-100 text-blue-800 font-bold rounded-full flex items-center justify-center mr-3">
-              {`${player.firstName[0]}${player.lastName[0]}`}
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-semibold text-green-600">Completed</h3>
+                <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                  {completed.length}
+                </span>
+              </div>
+              <div className="grid gap-2">
+                {completed.map(player => (
+                  <div key={player.id} className="flex items-center bg-white border border-gray-100 rounded-xl p-3 shadow-sm">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-500 text-white font-bold rounded-full flex items-center justify-center mr-3">
+                      {`${player.firstName[0]}${player.lastName[0]}`}
+                    </div>
+                    <p className="font-medium text-gray-900">{player.firstName} {player.lastName}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p className="text-md font-semibold text-gray-800">{player.firstName} {player.lastName}</p>
+
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-semibold text-red-600">Not Completed</h3>
+                <span className="bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                  {incomplete.length}
+                </span>
+              </div>
+              <div className="grid gap-2">
+                {incomplete.map(player => (
+                  <div key={player.id} className="flex items-center bg-white border border-gray-100 rounded-xl p-3 shadow-sm">
+                    <div className="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-500 text-white font-bold rounded-full flex items-center justify-center mr-3">
+                      {`${player.firstName[0]}${player.lastName[0]}`}
+                    </div>
+                    <p className="font-medium text-gray-900">{player.firstName} {player.lastName}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
